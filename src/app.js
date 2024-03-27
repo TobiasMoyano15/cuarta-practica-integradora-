@@ -1,12 +1,12 @@
 const express = require('express');
-const ProductManager = require('./ProductManager'); // Importar la clase ProductManager desde el archivo correspondiente
+const ProductManager = require('./ProductManager'); 
 const app = express();
-const port = 3000; // Puerto en el que se ejecutará el servidor
+const port = 3000; 
 
-// Crear una instancia de ProductManager
-const productManager = new ProductManager('./products.json'); // Ruta al archivo de productos
 
-// Ruta para obtener todos los productos
+const productManager = new ProductManager('./products.json'); 
+
+
 app.get('/products', async (req, res) => {
   try {
     let limit = parseInt(req.query.limit) || undefined;
@@ -18,7 +18,7 @@ app.get('/products', async (req, res) => {
   }
 });
 
-// Ruta para obtener un producto por su ID
+
 app.get('/products/:pid', async (req, res) => {
   try {
     const productId = parseInt(req.params.pid);
@@ -34,7 +34,7 @@ app.get('/products/:pid', async (req, res) => {
   }
 });
 
-// Iniciar el servidor
+
 app.listen(port, () => {
   console.log(`Servidor escuchando en http://localhost:${port}`);
 });
