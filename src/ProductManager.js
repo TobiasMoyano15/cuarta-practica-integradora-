@@ -1,130 +1,153 @@
-const fs = require('fs').promises; 
+import fs from 'fs';
+import { v4 as uuidv4 } from 'uuid';
 
-class ProductManager {
-  constructor(filePath) {
-    this.path = filePath; 
-    this.lastProductId = 0;
+export default class ProductManager {
+  constructor() {
+    this.path = "./products.json";
   }
 
-  async addProduct(product) {
+  readFile = async () => {
     try {
-      
-      const existingProducts = await this.getProducts();
-
-     
-      this.lastProductId++;
-      product.id = this.lastProductId;
-
-      
-      existingProducts.push(product);
-
-      
-      await fs.writeFile(this.path, JSON.stringify(existingProducts, null, 2));
-
-      console.log("Producto agregado correctamente:", product);
-    } catch (error) {
-      console.error("Error al agregar producto:", error);
-    }
-  }
-
-  async getProducts() {
-    try {
-      
-      const data = await fs.readFile(this.path, 'utf8');
-      return JSON.parse(data);
-    } catch (error) {
-      
+      const file = await fs.promises.readFile(this.path, 'utf-8');
+      return JSON.parse(file);
+    } catch {
       return [];
     }
-  }
+  };
 
-  async getProductById(id) {
+  writeFile = async (file) => {
     try {
-     
-      const products = await this.getProducts();
+      await fs.promises.writeFile(
+        this.path,
+        JSON.stringify(file, null, 2),
+        "utf-8"
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-      
-      const product = products.find(product => product.id === id);
+  codeValidation = (objeto, products) => {
+    const codeValidation = products.some(
+      (product) => objeto.code === product.code
+    );
+    if (codeValidation) {
+      throw new Error("El código corresponde a otro producto");
+    }
+  };
 
-      if (product) {
-        return product;
-      } else {
-        console.error("Producto no encontrado.");
-        return null;
+  addProduct = async (objeto) => {
+    try {
+      if (!objeto.code || !objeto.title || !objeto.description || !objeto.price || !objeto.thumbnail || !objeto.stock) {
+        throw new Error("Todos los campos son obligatorios");
       }
+
+      const products = await this.readFile();
+
+      this.codeValidation(objeto, products);
+
+      const newProduct = {
+        id: uuidv4(),
+        code: objeto.code,
+        title: objeto.title,
+        description: objeto.description,
+        price: parseFloat(objeto.price),
+        thumbnail: objeto.thumbnail,
+        stock: parseInt(objeto.stock),
+      };
+      products.push(newProduct);
+
+      await this.writeFile(products);
+
     } catch (error) {
-      console.error("Error al obtener producto por ID:", error);
-      return null;
+      console.log(error);
     }
-  }
+  };
 
-  async updateProduct(id, updatedFields) {
+  getProducts = async () => {
+    const products = await this.readFile();
+    return products;
+  };
+
+  getProductById = async (id) => {
     try {
+      const products = await this.readFile();
+      const productFound = products.find((product) => product.id === id);
+      return productFound;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  deleteProduct = async (id) => {
+    try {
+      const products = await this.readFile();
+      const indexToDelete = products.findIndex(p => p.id === id);
       
-      const products = await this.getProducts();
-
-      
-      const productIndex = products.findIndex(product => product.id === id);
-
-      if (productIndex !== -1) {
-        
-        products[productIndex] = { ...products[productIndex], ...updatedFields };
-
-        
-        await fs.writeFile(this.path, JSON.stringify(products, null, 2));
-
-        console.log("Producto actualizado correctamente:", products[productIndex]);
-      } else {
-        console.error("Producto no encontrado para actualizar.");
+      if (indexToDelete < 0) {
+        throw new Error(`El ${id} no corresponde a ningún producto en existencia`);
       }
-    } catch (error) {
-      console.error("Error al actualizar producto:", error);
-    }
-  }
 
-  async deleteProduct(id) {
+      products.splice(indexToDelete, 1);
+
+      await this.writeFile(products);
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  updateProduct = async (id, productToUpdate) => {
     try {
+      const products = await this.readFile();
+      const indexToUpdate = products.findIndex(p => p.id === id);
       
-      let products = await this.getProducts();
+      if (indexToUpdate < 0) {
+        throw new Error(`El ${id} no corresponde a ningún producto en existencia`);
+      }
 
-      
-      products = products.filter(product => product.id !== id);
+      this.codeValidation(productToUpdate, products);
 
-      
-      await fs.writeFile(this.path, JSON.stringify(products, null, 2));
+      products[indexToUpdate] = { ...products[indexToUpdate], ...productToUpdate, id };
 
-      console.log("Producto eliminado correctamente.");
+      await this.writeFile(products);
+
     } catch (error) {
-      console.error("Error al eliminar producto:", error);
+      console.log(error);
     }
-  }
+  };
 }
 
-// Ejemplo de uso
-const productManager = new ProductManager('products.json'); // Especificar el nombre del archivo de productos
+// Agrego los 10 productos:
 
-// Agregar productos
-productManager.addProduct({
-  title: "Producto 1",
-  description: "Descripción del producto 1",
-  price: 10.99,
-  thumbnail: "imagen1.jpg",
-  code: "ABC123",
-  stock: 20
-});
+const productManager = new ProductManager();
 
-// Obtener todos los productos
-productManager.getProducts()
-  .then(products => console.log("Todos los productos:", products))
-  .catch(error => console.error("Error al obtener productos:", error));
+const test = async () => {
+  const productoEncontrado = await productManager.getProductById('80feed59-d173-4805-8620-4b38f5f3ab5c');
+  console.log(productoEncontrado);
+};
 
-// Obtener un producto por su ID
-productManager.getProductById(2)
-  .then(product => console.log("Producto encontrado por ID:", product))
-  .catch(error => console.error("Error al obtener producto por ID:", error));
+// test();
 
-// Actualizar un producto por su ID
-productManager.updateProduct(1, { price: 15.99, stock: 25 });
+/*
+const productsUpLoad = async () => {
+  try {
+    let code = 111;
+    for (let i = 0; i < 10; i++) {
+      await productManager.addProduct({
+        title: "producto prueba " + (i + 1),
+        description: "Este es un producto prueba",
+        price: 300,
+        thumbnail: "Sin imagen",
+        code: code,
+        stock: 25,
+      });
+      code++;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
 
-// Eliminar un producto por su ID
-productManager.deleteProduct(3);
+productsUpLoad();
+*/

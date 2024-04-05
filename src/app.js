@@ -1,40 +1,32 @@
-const express = require('express');
-const ProductManager = require('./ProductManager'); 
+import express from 'express';
+import ProductManager from './ProductManager.js';
+
+const productManager = new ProductManager();
 const app = express();
-const port = 3000; 
 
-
-const productManager = new ProductManager('./products.json'); 
-
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/products', async (req, res) => {
-  try {
-    let limit = parseInt(req.query.limit) || undefined;
-    const products = await productManager.getProducts(limit);
-    res.json(products);
-  } catch (error) {
-    console.error("Error al obtener productos:", error);
-    res.status(500).json({ error: "Error al obtener productos" });
+  let { limit } = req.query;
+  const products = await productManager.getProducts();
+  if (limit) {
+    const limitedProducts = products.slice(0, limit);
+    res.send({ status: 'success', payload: limitedProducts });
   }
+  res.send({ status: 'success', payload: products });
 });
-
 
 app.get('/products/:pid', async (req, res) => {
-  try {
-    const productId = parseInt(req.params.pid);
-    const product = await productManager.getProductById(productId);
-    if (product) {
-      res.json(product);
-    } else {
-      res.status(404).json({ error: "Producto no encontrado" });
-    }
-  } catch (error) {
-    console.error("Error al obtener producto por ID:", error);
-    res.status(500).json({ error: "Error al obtener producto por ID" });
+  const { pid } = req.params;
+  const productFound = await productManager.getProductById(pid);
+  if (!productFound) {
+    res.status(404).send({ status: 'error', error: 'Producto no encontrado' });
   }
+  res.send({ status: 'success', payload: productFound });
 });
 
-
-app.listen(port, () => {
-  console.log(`Servidor escuchando en http://localhost:${port}`);
+app.listen(8080, (err) => {
+  if (err) console.log(err);
+  console.log('Servidor escuchando en el puerto 8080');
 });
