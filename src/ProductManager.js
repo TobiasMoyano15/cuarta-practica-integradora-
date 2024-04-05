@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export default class ProductManager {
   constructor() {
-    this.path = "./products.json";
+    this.path = './products.json';
   }
 
   readFile = async () => {
@@ -17,29 +17,23 @@ export default class ProductManager {
 
   writeFile = async (file) => {
     try {
-      await fs.promises.writeFile(
-        this.path,
-        JSON.stringify(file, null, 2),
-        "utf-8"
-      );
+      await fs.promises.writeFile(this.path, JSON.stringify(file, null, 2), 'utf-8');
     } catch (err) {
       console.log(err);
     }
   };
 
   codeValidation = (objeto, products) => {
-    const codeValidation = products.some(
-      (product) => objeto.code === product.code
-    );
+    const codeValidation = products.some((product) => objeto.code === product.code);
     if (codeValidation) {
-      throw new Error("El código corresponde a otro producto");
+      throw new Error('El codigo corresponde a otro producto');
     }
   };
 
   addProduct = async (objeto) => {
     try {
       if (!objeto.code || !objeto.title || !objeto.description || !objeto.price || !objeto.thumbnail || !objeto.stock) {
-        throw new Error("Todos los campos son obligatorios");
+        throw new Error('Todos los campos son obligatorios');
       }
 
       const products = await this.readFile();
@@ -55,10 +49,9 @@ export default class ProductManager {
         thumbnail: objeto.thumbnail,
         stock: parseInt(objeto.stock),
       };
-      products.push(newProduct);
+      await products.push(newProduct);
 
       await this.writeFile(products);
-
     } catch (error) {
       console.log(error);
     }
@@ -82,72 +75,98 @@ export default class ProductManager {
   deleteProduct = async (id) => {
     try {
       const products = await this.readFile();
-      const indexToDelete = products.findIndex(p => p.id === id);
-      
+      const indexToDelete = products.findIndex((p) => p.id === id);
+
       if (indexToDelete < 0) {
-        throw new Error(`El ${id} no corresponde a ningún producto en existencia`);
+        throw new Error(`El ${id} no corresponde a ningun producto en existencia`);
       }
 
       products.splice(indexToDelete, 1);
 
       await this.writeFile(products);
-
     } catch (error) {
       console.log(error);
     }
   };
 
   updateProduct = async (id, productToUpdate) => {
-    try {
-      const products = await this.readFile();
-      const indexToUpdate = products.findIndex(p => p.id === id);
-      
-      if (indexToUpdate < 0) {
-        throw new Error(`El ${id} no corresponde a ningún producto en existencia`);
-      }
+    const products = await this.readFile();
+    const indexToUpdate = products.findIndex((p) => p.id === id);
 
-      this.codeValidation(productToUpdate, products);
-
-      products[indexToUpdate] = { ...products[indexToUpdate], ...productToUpdate, id };
-
-      await this.writeFile(products);
-
-    } catch (error) {
-      console.log(error);
+    if (indexToUpdate < 0) {
+      throw new Error(`El ${id} no corresponde a ningun producto en existencia`);
     }
+
+    this.codeValidation(productToUpdate, products);
+
+    products[indexToUpdate] = { ...products[indexToUpdate], ...productToUpdate, id };
+
+    await this.writeFile(products);
   };
 }
+// Agrega los productos al final del archivo ProductManager.js
 
-// Agrego los 10 productos:
-
-const productManager = new ProductManager();
-
-const test = async () => {
-  const productoEncontrado = await productManager.getProductById('80feed59-d173-4805-8620-4b38f5f3ab5c');
-  console.log(productoEncontrado);
-};
-
-// test();
-
-/*
-const productsUpLoad = async () => {
+// Agregar productos
+const addProducts = async () => {
   try {
-    let code = 111;
-    for (let i = 0; i < 10; i++) {
-      await productManager.addProduct({
-        title: "producto prueba " + (i + 1),
-        description: "Este es un producto prueba",
-        price: 300,
-        thumbnail: "Sin imagen",
-        code: code,
-        stock: 25,
-      });
-      code++;
-    }
-  } catch (err) {
-    console.log(err);
+    await this.addProduct({
+      title: 'producto prueba 1',
+      description: 'Este es un producto prueba',
+      price: 300,
+      thumbnail: 'Sin imagen',
+      code: 111,
+      stock: 25,
+    });
+
+    await this.addProduct({
+      title: 'producto prueba 2',
+      description: 'Este es un producto prueba',
+      price: 300,
+      thumbnail: 'Sin imagen',
+      code: 112,
+      stock: 25,
+    });
+
+    await this.addProduct({
+      title: 'producto prueba 3',
+      description: 'Este es un producto prueba',
+      price: 300,
+      thumbnail: 'Sin imagen',
+      code: 113,
+      stock: 25,
+    });
+
+    await this.addProduct({
+      title: 'producto prueba 4',
+      description: 'Este es un producto prueba',
+      price: 300,
+      thumbnail: 'Sin imagen',
+      code: 114,
+      stock: 25,
+    });
+
+    await this.addProduct({
+      title: 'producto prueba 5',
+      description: 'Este es un producto prueba',
+      price: 300,
+      thumbnail: 'Sin imagen',
+      code: 115,
+      stock: 25,
+    });
+
+    await this.addProduct({
+      title: 'producto prueba 6',
+      description: 'Este es un producto prueba',
+      price: 300,
+      thumbnail: 'Sin imagen',
+      code: 116,
+      stock: 25,
+    });
+
+    console.log('Productos agregados exitosamente');
+  } catch (error) {
+    console.log(error);
   }
 };
 
-productsUpLoad();
-*/
+addProducts();
