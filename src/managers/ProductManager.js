@@ -49,7 +49,8 @@ export default class ProductManager {
         thumbnail: objeto.thumbnail,
         stock: parseInt(objeto.stock),
       };
-      await products.push(newProduct);
+
+      products.push(newProduct); // No necesitas usar await aquí
 
       await this.writeFile(products);
     } catch (error) {
@@ -104,6 +105,11 @@ export default class ProductManager {
     await this.writeFile(products);
   };
 }
+
+// Crear una instancia de la clase para utilizar los métodos
+const instancia = new ProductManager();
+await instancia.addProduct
+
 // Agrega los productos al final del archivo ProductManager.js
 
 // Agregar productos
