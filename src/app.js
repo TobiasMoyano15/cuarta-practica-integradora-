@@ -1,54 +1,53 @@
 import express from 'express';
-import { create } from 'express-handlebars';
-import http from 'http';
-import socketio from 'socket.io';
-import ProductManager from './ProductManager.js';
+import  productsRouter  from './routes/ProductRouter.js';
+import  cartRouter  from './routes/CartRouter.js';
+import  viewsRouter  from './routes/ViewRouter.js';
+import { __dirname, uploader } from './utils.js';
+import handlebars from 'express-handlebars';
+import { Server } from 'socket.io';
 
-const productManager = new ProductManager();
 const app = express();
-const server = http.createServer(app);
-const io = socketio(server);
 
-const hbs = create({
-  extname: '.handlebars',
-  defaultLayout: 'main' // O el nombre del layout principal que quieras utilizar
-});
+const httpServer = app.listen(8080, err => {
+    if(err) console.log(err);
+    console.log('Server escuchando en puerto 8080');
+})
 
-app.engine('.handlebars', hbs.engine);
-app.set('view engine', '.handlebars');
-app.set('views', './views');
+const io = new Server(httpServer);
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended: true}));
+app.use(express.static(__dirname + '/public'));
 
-app.get('/products', async (req, res) => {
-  let { limit } = req.query;
-  const products = await productManager.getProducts();
-  if (limit) {
-    const limitedProducts = products.slice(0, limit);
-    res.send({ status: 'success', payload: limitedProducts });
-  }
-  res.send({ status: 'success', payload: products });
+app.engine('hbs', handlebars.engine({
+    extname: '.hbs'
+}));
+
+app.set('views', __dirname + '/views');
+app.set('view engine', 'hbs');
+
+
+
+app.use('/upload-file', uploader.single('myFile'), (req, res) => {
+    if(!req.file) {
+        return res.send('No se pudo subir el archivo')
+    };
+    res.status(200).send ('Archivo subido con éxito')
 });
 
-app.get('/products/:pid', async (req, res) => {
-  const { pid } = req.params;
-  const productFound = await productManager.getProductById(pid);
-  if (!productFound) {
-    res.status(404).send({ status: 'error', error: 'Producto no encontrado' });
-  }
-  res.send({ status: 'success', payload: productFound });
-});
+app.use('/', viewsRouter);
 
-io.on('connection', (socket) => {
-  console.log('Un cliente se ha conectado');
+app.use('/api/products', productsRouter);
 
-  socket.on('new product', (productData) => {
-    io.emit('update products', productData);
-  });
-});
+app.use('/api/cart', cartRouter);
 
-server.listen(8080, (err) => {
-  if (err) console.log(err);
-  console.log('Servidor escuchando en el puerto 8080');
+let messages = []
+io.on('connection', socket => {
+    console.log('Cliente conectado');
+
+    socket.on('message', data => {
+        messages.push(data)
+        io.emit('messageLogs', messages )
+    })
+
 });
