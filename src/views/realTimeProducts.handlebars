@@ -1,44 +1,122 @@
 <main>
-    <div>
-        <h1>LISTA DE PRODUCTOS:</h1>
-        <div class="product-container">
-            {{#each products}}
-            <div class="rtproduct">
-                <h3>{{this.title}}</h3>
-                <p>Id: {{this.id}}</p>
-                <p>Precio: ${{this.price}}</p>
-                <p>Stock: {{this.stock}}</p>
+<div class="mainContainer">
+<div>
+    <h1>{{title}}</h1>
+    <h2>Los productos en existencia son:</h2>
+    
+    <div id="productsContainer">
+    
+    {{#if products}}
+        
+        {{#each products}}
+        <div class="productContainer" id={{this._id}}>
+            <h3>{{this.title}}</h3>
+            <p><span>Cod:</span>{{this.code}}</p>
+            <p>{{this.description}}</p>
+            <p><span>$</span>{{this.price}}</p>
+            <div class="buttonContainer">
+                <button id="borrar" onclick="borrar()">Borrar</button>
+                <button id="actualizar" onclick="actualizar()">Actualizar</button>
             </div>
+        </div>
+        {{/each}}
+    {{else}}
+        <h2>No hay productos</h2>
+    {{/if}}
+    
+    </div>
+</div>
+<div>
+    <form id="formulario-cargaMasiva" class="formularios">
+        <h4>Carga Masiva de Productos mediante excel:</h4>
+        <input type="file" name="bdFile" placeholder="Inserte el archivo" required>
+        <button type="submit">Agregar Productos</button>
+    </form>
+    <form id="formulario-categoria" class="formularios">
+        <h4>Formulario para agregar categorias:</h4>
+        <label for="categoryName">Nombre de la Categoria:</label>
+        <input type="text" name="categoryName" placeholder="Nombre de la categoria" required>
+        <button type="submit">Agrega Categoria</button>
+    </form>
+
+    <form id="formulario-subCategoria" class="formularios">
+        <h4>Formulario para agregar Sub-Categorias:</h4>
+        <div>
+        <label for="category">Categoria:</label>
+        <select name="categoryName">
+            {{#each categories}}
+                <option value="{{this.categoryName}}">{{this.categoryName}}</option>
             {{/each}}
+        </select>
+        </div>
+        <label for="subCategoryName">Nombre de la Sub-Categoria:</label>
+        <input type="text" name="subCategoryName" placeholder="Nombre de la sub-Categoria" required>
+        <button type="submit">Agrega Sub-Categoria</button>
+    </form>
+
+
+
+    <form id="formulario-producto" class="formularios">
+        <h4>Formulario para agregar productos:</h4>
+        <input type="text" name="title" placeholder="Nombre del producto" required>
+        <input type="text" name="code" placeholder="Codigo del producto" required>
+        <input type="text" name="category" placeholder="Categoría del producto" required>
+        <input type="text" name="sub-category" placeholder="Sub-categoría del producto" required>
+        <input type="text" name="brand" placeholder="Marca del producto" required>
+        <input type="text" name="provider" placeholder="Proveedor" required>
+        <input type="text" name="thumbnail" placeholder="Ruta de la foto" required>
+        <input type="number" name="cost" placeholder="Costo del producto" required>
+        <div>
+        <input type="number" name="markdown" placeholder="Porcentaje de marcado del producto" required>
+        <span>%</span>
+        </div>
+        <input type="number" name="stock" placeholder="Stock del producto" required>
+        <textarea name="description" placeholder="Descripción del producto"></textarea>
+        <button type="submit">Agregar Producto</button>
+    </form>
+    <form id="formulario-actualizacionPrecios" class="formularios">
+        <h4>Actualizacion de precios</h4>
+        <div>
+            <input type="radio" name="raise" value="raise" checked> <span>Aumento</span>
+            <input type="radio" name="decrease" value="decrease"> <span>Descuento</span>
         </div>
         <div>
-            <h1>Agregar Producto:</h1>
-            <form method="post" id="agregarForm" action="http://localhost:8080/api/products/"></form>
-            <input type="text" placeholder="Ingrese el titulo" id="title" name="title" required />
-            <input type="number" placeholder="Ingrese el precio" id="price" name="price" required>
-            <input type="text" placeholder="Ingrese código" id="code" name="code" required>
-            <input type="number" placeholder="Ingrese stock" id="stock" name="stock" required>
-            <input placeholder="Agregue una descripción" id="description" name="description" required></input>
-            <div class="submit">
-                <button type="submit" onclick="agregar(event)" id="botonAgregar">Agregar producto</button>
-            </div>
-            </form>
-            <form>
-                <h1>Borrar Producto:</h1>
-                <div class="form-input">
-                    <input type="number" placeholder="Ingrese el id" id="id" name="id" required>
-                </div>
-                <div class="submit">
-                    <button type="submit" onclick="" id="delete">Borrar producto</button>
-                </div>
-
-            </form>
+        <label for="category">Categoria:</label>
+        <select name="--Seleccione Categoria--" id="">
+            <option value="all">Todas las categorias</option>
+            {{#each categories}}
+                <option value="{{this.categoryName}}">{{this.categoryName}}</option>
+            {{/each}}
+        </select>
         </div>
         <div>
-            <a href="/">Volver a inicio</a>
+        <label for="subCategory">Sub Categoria:</label>
+        <select name="--Seleccione Sub-Categoria--" id="">
+            <option value="all">Todas las sub-categorias</option>
+            {{#each subCategories}}
+                <option value="{{this.categoryName}}">{{this.categoryName}}</option>
+            {{/each}}
+        </select>
         </div>
+        <div>
+        <label for="percentage">Marca:</label>
+        <select name="--Seleccione Marca--" id="">
+            <option value="all">Todas las marcas</option>
+            {{#each brands}}
+                <option value="{{this.brandName}}">{{this.brandName}}</option>
+            {{/each}}
+        </select>
+        </div>
+        <div>
+            <label for="percentage">Porcentaje:</label>
+            <input type="number" name="percentage" placeholder="porcentaje a actualizar" required><span>%</span>
+        </div>
+        <button type="submit">Actualizar</button>
+    </form>
 
-
+</div>
+</div>
 </main>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
-<script type="module" src="/js/realTimeProducts.js"></script>
+<script src="/js/realTimeProducts.js"></script>
