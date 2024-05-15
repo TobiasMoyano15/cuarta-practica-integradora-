@@ -1,57 +1,106 @@
-import { Router } from "express";
-import MDBProductManager from "../dao/MongoDB.ProductManager.js";
-import { __dirname } from "../utils/utils.js";
+import { Router } from 'express'
+import ProductsMongoManager from '../dao/ProductsMongo.manager';
 
-const router = new Router() 
-const mdbProductManager = new MDBProductManager();
+const router = Router()
+const productService = new ProductsMongoManager
 
-router.get('/', async (req,res)=>{
-    let {limit} = req.query
-    const products = await mdbProductManager.getProducts()
-    if(limit){
-        const limitedProducts = products.slice(0,limit)
-        return res.send({status: 'success', payload: limitedProducts})
+router.get('/', async (req, res) => {
+    try {
+        const { limit = 10, pageNum = 1, category, status, product:title, sortByPrice } = req.query;
+        const { docs, page, hasPrevPage, hasNextPage, prevPage, nextPage, totalPages} = await productService.getProducts({ limit, pageNum, category, status, title, sortByPrice });
+        
+        let prevLink = null;
+        let nextLink = null;
+    
+        if (hasPrevPage) {
+            prevLink = `/products?pageNum=${prevPage}`;
+            if (limit) prevLink += `&limit=${limit}`;
+            if (title) prevLink += `&title=${title}`;
+            if (category) prevLink += `&category=${category}`;
+            if (status) prevLink += `&status=${status}`;
+            if (sortByPrice) prevLink += `&sortByPrice=${sortByPrice}`;
+        }
+    
+        if (hasNextPage) {
+            nextLink = `/products?pageNum=${nextPage}`;
+            if (limit) nextLink += `&limit=${limit}`;
+            if (category) nextLink += `&category=${category}`;
+            if (status) nextLink += `&status=${status}`;
+            if (sortByPrice) nextLink += `&sortByPrice=${sortByPrice}`;
+        }
+
+        res.status(200).send({
+            status: 'success',
+            payload: {
+                products: docs,
+                totalPages,
+                prevPage,
+                nextPage,
+                page,
+                hasPrevPage,
+                hasNextPage,
+                prevLink,
+                nextLink
+            }
+        });
+    } catch (error) {
+        res.status(500).send({ status: 'error', error: 'No se pudo leer la base de datos' });
     }
-    res.send({status: 'success', payload: products})
-})
-router.get('/:pid', async (req,res)=>{
-    const {pid} = req.params
-    const productFound = await mdbProductManager.getProductById(pid)
-    if(!productFound){
-        return res.status(404).send({status:'error', error: 'Producto no encontrado'})
+});
+
+
+router.post('/', async (req, res) => {
+    const { title, description, code, price, status = true, stock, category, thumbnails } = req.body;
+    const products = await productService.getProducts()
+
+    if (!title || !description || !code || !price || !stock || !category)
+        return res.status(400).send({ status: 'error', error: 'faltan campos' });
+
+    if (products.find((prod) => prod.code === code))
+        return res.status(400).send({ status: 'error', error: `No se pudo agregar el producto con el código ${code} porque ya existe un producto con ese código` });
+
+    const newProduct = await productService.addProduct(title, description, code, price, status, stock, category, thumbnails);
+    res.status(201).send({ status: 'success', payload: newProduct });
+});
+
+
+
+
+router.get('/:pid', async (req, res) => {
+    const { pid } = req.params;
+    const productFound = await productService.getProductsById(pid);
+
+    if (!productFound)
+        return res.status(400).send({ status: 'error', error: `¡ERROR! No existe ningún producto con el id ${pid}` });
+
+    res.status(200).send({ status: 'success', payload: productFound });
+});
+
+router.put('/:pid', async (req, res) => {
+    const { pid } = req.params;
+    const { title, description, code, price, status = true, stock, category, thumbnails } = req.body;
+    const productFound = await productService.getProductsById(pid);
+
+    if (!title || !description || !code || !price || !stock || !category) {
+        return res.status(400).send({ status: 'error', error: 'faltan campos' });
     }
-    res.send({status: 'success', payload: productFound})
-})
 
-router.post('/', async (req,res)=>{
-    res.send(await mdbProductManager.addProduct(req.body))
-    const {io} = req
-    io.emit('realTimeProducts', await mdbProductManager.getProducts())
-})
+    if (!productFound) return res.status(400).send({ status: 'error', error: `No existe el producto con el id ${pid}` });
 
-router.put('/:pid', async (req,res)=>{
-    const {pid} = req.params
-    res.send(await mdbProductManager.updateProduct(pid,req.body))
-    const {io} = req
-    io.emit('realTimeProducts-upload', await mdbProductManager.getProducts())
-})
+    const updatedProduct = await productService.updateProduct(pid, { title, description, code, price, status, stock, category, thumbnails });
+    res.status(201).send({ status: 'success', payload: updatedProduct });
+});
 
-router.delete('/:pid', async(req,res)=>{
-    const {pid} = req.params
-    res.send(await mdbProductManager.deleteProduct(pid))
-    const {io} = req
-    io.emit('realTimeProducts-delete', await mdbProductManager.getProducts())
-})
+router.delete('/:pid', async (req, res) => {
+    const { pid } = req.params;
+    const productFound = await productService.getProductsById(pid);
 
-//CRUD Categorias:
+    if (!productFound) return res.status(400).send({ status: 'error', error: `¡ERROR! No existe ningún producto con el id ${pid}` });
 
-router.post('/categories', async (req,res)=>{
-    res.send(await mdbProductManager.addCategory(req.body))
-})
+    res.status(200).send({ status: 'success', payload: productFound });
+    productService.deleteProduct(pid);
 
-router.post('/subCategories', async (req,res)=>{
-    res.send(await mdbProductManager.addSubCategory(req.body))
-})
+});
 
 
-export default router
+export default router;

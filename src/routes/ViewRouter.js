@@ -1,46 +1,75 @@
 import { Router } from "express";
-//import ProductManager from '../dao/MongoDB.ProductManager.js'
-import MDBProductManager from "../dao/MongoDB.ProductManager.js";
-import { messageModel } from "../dao/models/message.model.js";
-const router = new Router()
-const productManager = new MDBProductManager();
+import { __dirname } from '../FileNameUtil.js'
+import ProductsMongoManager from "../dao/ProductsMongo.manager.js";
+import CartsMongoManager from "../dao/CartMongo.manager.js";
 
-router.get('/', async (req,res)=>{
-    const products = await productManager.getProducts()
-    res.render('home', {
-        title: 'Productos',
-        products,
-        styles: 'homeStyles.css'
+
+const productsJsonPath = `${__dirname}/FS-Database/Products.json`;
+const productService = new ProductsMongoManager();
+const cartService = new CartsMongoManager();
+
+const router = Router()
+
+router.get('/products', async (req, res) => {
+    const { limit = 10, pageNum = 1, category, status, product:title, sortByPrice } = req.query
+    const { docs, page, hasPrevPage, hasNextPage, prevPage, nextPage, totalPages } = await productService.getProducts({ limit, pageNum, category, status, title, sortByPrice })
+
+    let prevLink = null;
+    let nextLink = null;
+
+    if (hasPrevPage) {
+        prevLink = `/products?pageNum=${prevPage}`;
+        if (limit) prevLink += `&limit=${limit}`;
+        if (title) prevLink += `&title=${title}`;
+        if (category) prevLink += `&category=${category}`;
+        if (status) prevLink += `&status=${status}`;
+        if (sortByPrice) prevLink += `&sortByPrice=${sortByPrice}`;
+    }
+
+    if (hasNextPage) {
+        nextLink = `/products?pageNum=${nextPage}`;
+        if (limit) nextLink += `&limit=${limit}`;
+        if (category) nextLink += `&category=${category}`;
+        if (status) nextLink += `&status=${status}`;
+        if (sortByPrice) nextLink += `&sortByPrice=${sortByPrice}`;
+    }
+    return res.render('./index.hbs', {
+        products: docs,
+        totalPages,
+        prevPage,
+        nextPage,
+        page,
+        hasPrevPage,
+        hasNextPage,
+        prevLink,
+        nextLink,
+        category,
+        sortByPrice,
+        availability: status
     })
 })
 
-router.get('/realTimeProducts', async (req,res)=>{
-    const products = await productManager.getProducts()
-    //const categories = [{categoryName: "categoria1"},{categoryName: "categoria2"},{categoryName: "categoria3"}]
-    const subCategories = [{subCategoryName: "sub-categoria1"},{subCategoryName: "sub-categoria1"},{subCategoryName: "sub-categoria1"}]
-    const brands = [{brandName: "Marca1"},{brandName: "Marca2"},{brandName: "Marca3"}]
-    const categories = await productManager.getCategories()
-    res.render('realTimeProducts', {
-        title: 'Productos en tiempo real',
-        products : products,
-        styles: 'homeStyles.css',
-        categories,
-        subCategories
-    })
-})
-
-router.get('/chat', async (req,res)=>{
-    const messages = await messageModel.find().lean()
-    res.render('chat', {
-        title: 'Chat:',
-        messages,
-        styles: 'homeStyles.css'
-    })
-   
-    const {io} = req
+router.get('/product/:pid', async (req, res) => {
+    const { pid } = req.params;
     
-    
+    const product = await productService.getProductsById(pid)
+    // cart Id hardcodeado para probar el boton agregar al carrito
+    const cartId =  '6641b6b5b2cc19ccdc4776eb'
+    res.render('./product.hbs', {product, cartId} )
 })
 
+router.get('/cart/:cid', async (req, res) => {
+    const { cid } = req.params;
 
+    const cart = await cartService.getCartById(cid)
+    res.render('./cart.hbs', { cart })
+})
+
+router.get('/realtimeproducts', async (req, res) => {
+    res.render('./realtimeproducts.hbs', {})
+})
+
+router.get('/chat', async (req, res) => {
+    res.render('./chat.hbs', {})
+})
 export default router

@@ -1,22 +1,62 @@
-<div>
-    <h1>{{title}}</h1>
-    <h2>Los productos en existencia son:</h2>
-    <div id="productsContainer">
-    {{#if products}}
-        {{#each products}}
-        <div class="productContainer" id={{this._id}}>
-            <h3>{{this.title}}</h3>
-            <p>{{this.code}}</p>
-            <p>{{this.description}}</p>
-            <p>{{this.price}}</p>
-            <div class="buttonContainer">
-                <button id="addToCart">Agregar al Carrito</button>
+<main class="main">
+    <section class="container">
+        <h1>Nuestros Buzos</h1>
+        <div>
+            <h2>Categorias</h2>
+            <a href="/products?category=cafe">Hoodies</a>
+            <a href="/products?category=te">Estampados</a>
+            <a href="/products?category=comestibles">Lizos</a>
+            <a href="/products">Todos</a>
+        </div>
+        <div>
+            <h2>Búsqueda de producto</h2>
+            <form action="/products?title={{title}}" method="get">
+                <input type="text" name="product" placeholder="Busca tu producto">
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+        <div>
+            <a href="/products?status=true">Disponibles</a>
+            <a href="/products?status=false">No disponibles</a>
+        </div>
+        <div>
+            <h2>Ordenar por precio</h2>
+            <a href="/products?sortByPrice=1&category={{category}}">Ordenar ascendente</a>
+            <a href="/products?sortByPrice=-1&category={{category}}">Ordenar descendente</a>
+        </div>
+        <div>
+            <h2>Productos</h2>
+            <div>
+                <div class="product-grid">
+                    {{#each products}}
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="/images/IMG_placeholder.jpg" alt="Product">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">{{this.title}}</h2>
+                            <h3 class="product-price">${{this.price}}</h3>
+                        </div>
+                        <a href="/product/{{this._id}}"><button class="product-btn" data-product-id="{{product._id}}"
+                                data-cart-id="{{cartId}}">Ver más</button></a>
+                    </div>
+                    {{/each}}
+                </div>
             </div>
         </div>
-        {{/each}}
-    {{else}}
-        <h2>No hay productos</h2>
-    {{/if}}
-    </div>
-</div>
-<script src="/js/home.js"></script>
+    </section>
+    <section class=" container-center">
+        <div class="div-flex">
+            <div class="div-center">
+
+                {{#if hasPrevPage}}
+                <a href={{prevLink}}>Anterior</a>
+                {{/if}}
+                <p>{{page}}</p>
+                {{#if hasNextPage}}
+                <a href={{nextLink}}>Siguiente</a>
+                {{/if}}
+            </div>
+        </div>
+    </section>
+</main>

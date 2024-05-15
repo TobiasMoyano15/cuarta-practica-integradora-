@@ -1,10 +1,11 @@
-import mongoose from "mongoose";
+import { connect } from 'mongoose'
 
-const password = () =>{
-    const password = '62bzFL87xRQujfZx'
-    return password
+
+const connectMongoDB = () => {
+    
+    connect('mongosh "mongodb+srv://cluster0.ebidatw.mongodb.net/" --apiVersion 1 --username tobiasmoyano09')
+    console.log('Base de datos conectada')
 }
-export const connect = ()=>{
-    mongoose.connect(mongodb+srv,//tobiasmoyano09:<password>@cluster0.ebidatw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-)
-}
+
+
+export default connectMongoDB

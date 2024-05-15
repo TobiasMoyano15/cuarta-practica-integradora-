@@ -1,32 +1,22 @@
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-import fs from 'fs'
+export default async function fetchData(route, settings = {}) {
+  try {
+      const response = await fetch(route, {
+          headers: {
+              Accept: 'application/json, text/plain, */*',
+              'Content-Type': 'application/json'
+            },
+            ...settings
+      });
 
-const __filename = fileURLToPath(import.meta.url)
-export const __dirname = dirname(__filename)
+      if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error);
+      }
 
-export const readFile = async(path)=>{
-    try{
-    const file = await fs.promises.readFile(path, 'utf-8')
-    return JSON.parse(file)
-  } catch {
-    return []
+      const responseData = await response.json();
+      return responseData;
+  } catch (error) {
+      throw new Error(error.message);
   }
 }
 
-export const writeFile = async(file,path)=>{
-    try{
-      await fs.promises.writeFile(
-        path,
-        JSON.stringify(file, 'null',2),
-        "utf-8")
-  } catch (err){
-    console.log(err)
-  }
-  }
-
-/* export const isExist = async (id,path) =>{
-    const array = await readFile(path)
-    const isExist = array.some(c => c.id === id)
-    return isExist
-} */

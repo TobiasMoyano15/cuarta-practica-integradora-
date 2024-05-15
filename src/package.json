@@ -34,7 +34,7 @@
     "is-number": "^7.0.0",
     "lru-cache": "^6.0.0",
     "minimatch": "^3.1.2",
-    "mongodb": "^6.6.0",
+    "mongodb": "^6.6.1",
     "mongoose": "^8.3.4",
     "nopt": "^1.0.10",
     "normalize-path": "^3.0.0",
