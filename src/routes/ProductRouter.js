@@ -1,17 +1,17 @@
-import { Router } from 'express'
+import { Router } from 'express';
 import ProductsMongoManager from '../dao/ProductsMongo.manager';
 
-const router = Router()
-const productService = new ProductsMongoManager
+const router = Router();
+const productService = new ProductsMongoManager;
 
 router.get('/', async (req, res) => {
     try {
-        const { limit = 10, pageNum = 1, category, status, product:title, sortByPrice } = req.query;
-        const { docs, page, hasPrevPage, hasNextPage, prevPage, nextPage, totalPages} = await productService.getProducts({ limit, pageNum, category, status, title, sortByPrice });
-        
+        const { limit = 10, pageNum = 1, category, status, product: title, sortByPrice } = req.query;
+        const { docs, page, hasPrevPage, hasNextPage, prevPage, nextPage, totalPages } = await productService.getProducts({ limit, pageNum, category, status, title, sortByPrice });
+
         let prevLink = null;
         let nextLink = null;
-    
+
         if (hasPrevPage) {
             prevLink = `/products?pageNum=${prevPage}`;
             if (limit) prevLink += `&limit=${limit}`;
@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
             if (status) prevLink += `&status=${status}`;
             if (sortByPrice) prevLink += `&sortByPrice=${sortByPrice}`;
         }
-    
+
         if (hasNextPage) {
             nextLink = `/products?pageNum=${nextPage}`;
             if (limit) nextLink += `&limit=${limit}`;
@@ -51,7 +51,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     const { title, description, code, price, status = true, stock, category, thumbnails } = req.body;
-    const products = await productService.getProducts()
+    const products = await productService.getProducts();
 
     if (!title || !description || !code || !price || !stock || !category)
         return res.status(400).send({ status: 'error', error: 'faltan campos' });
@@ -62,9 +62,6 @@ router.post('/', async (req, res) => {
     const newProduct = await productService.addProduct(title, description, code, price, status, stock, category, thumbnails);
     res.status(201).send({ status: 'success', payload: newProduct });
 });
-
-
-
 
 router.get('/:pid', async (req, res) => {
     const { pid } = req.params;

@@ -5,10 +5,10 @@ addToCartBtn.addEventListener('click', async () => {
     const productId = addToCartBtn.dataset.productId;
     const productTitle = addToCartBtn.dataset.productTitle;
     let quantity = 1;
-   console.log(productId)
-   console.log(productTitle)
+    console.log(productId);
+    console.log(productTitle);
     try {
-        
+
         const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
             method: 'POST',
             headers: {

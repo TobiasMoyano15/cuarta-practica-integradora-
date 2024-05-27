@@ -1,18 +1,48 @@
 import { Router } from "express";
-import { __dirname } from '../FileNameUtil.js'
+import { __dirname } from '../FileNameUtil.js';
 import ProductsMongoManager from "../dao/ProductsMongo.manager.js";
 import CartsMongoManager from "../dao/CartMongo.manager.js";
-
+import { UsersManagerMongo } from "../dao/UsersMongo.js";
+import { auth } from "../middlewares/auth.middleware.js";
+import { sessionsRouter } from "./Sessions.router.js";
 
 const productsJsonPath = `${__dirname}/FS-Database/Products.json`;
 const productService = new ProductsMongoManager();
 const cartService = new CartsMongoManager();
 
-const router = Router()
+const router = Router();
+
+router.get('/', async (req, res) => {
+    res.redirect('/login');
+});
+
+router.get('/login', (req, res) => {
+    res.render('login.hbs');
+});
+router.get('/register', (req, res) => {
+    res.render('register.hbs');
+});
+
+router.get('/users', auth, async (req, res) => {
+    const { numPage, limit } = req.query;
+
+    const userService = new UsersManagerMongo();
+    const { docs, page, hasPrevPage, hasNextPage, prevPage, nextPage } = await userService.getUsers({ limit, numPage });
+    // console.log(resp)
+
+    res.render('users.hbs', {
+        users: docs,
+        page,
+        hasNextPage,
+        hasPrevPage,
+        nextPage,
+        prevPage
+    });
+});
 
 router.get('/products', async (req, res) => {
-    const { limit = 10, pageNum = 1, category, status, product:title, sortByPrice } = req.query
-    const { docs, page, hasPrevPage, hasNextPage, prevPage, nextPage, totalPages } = await productService.getProducts({ limit, pageNum, category, status, title, sortByPrice })
+    const { limit = 10, pageNum = 1, category, status, product: title, sortByPrice } = req.query;
+    const { docs, page, hasPrevPage, hasNextPage, prevPage, nextPage, totalPages } = await productService.getProducts({ limit, pageNum, category, status, title, sortByPrice });
 
     let prevLink = null;
     let nextLink = null;
@@ -45,31 +75,36 @@ router.get('/products', async (req, res) => {
         nextLink,
         category,
         sortByPrice,
-        availability: status
-    })
-})
+        availability: status,
+        email: req.session.user.email,
+        role: req.session.user.role
+    });
+});
+
+
 
 router.get('/product/:pid', async (req, res) => {
     const { pid } = req.params;
-    
-    const product = await productService.getProductsById(pid)
+
+    const product = await productService.getProductsById(pid);
     // cart Id hardcodeado para probar el boton agregar al carrito
-    const cartId =  '6641b6b5b2cc19ccdc4776eb'
-    res.render('./product.hbs', {product, cartId} )
-})
+    const cartId = '6641b6b5b2cc19ccdc4776eb';
+    res.render('./product.hbs', { product, cartId });
+});
 
 router.get('/cart/:cid', async (req, res) => {
     const { cid } = req.params;
 
-    const cart = await cartService.getCartById(cid)
-    res.render('./cart.hbs', { cart })
-})
+    const cart = await cartService.getCartById(cid);
+    res.render('./cart.hbs', { cart });
+});
 
 router.get('/realtimeproducts', async (req, res) => {
-    res.render('./realtimeproducts.hbs', {})
-})
+    res.render('./realtimeproducts.hbs', {});
+});
 
 router.get('/chat', async (req, res) => {
-    res.render('./chat.hbs', {})
-})
-export default router
+    res.render('./chat.hbs', {});
+});
+
+export default router;

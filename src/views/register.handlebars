@@ -1,0 +1,36 @@
+<main class="container">
+  <h1>Register</h1>
+  <form action="/api/sessions/register" method="POST" class="form-group w-50">
+    <label>Nombre</label>
+    <input
+      type="text"
+      name="first_name"
+      placeholder="Ingresa tu nombre"
+      class="form-control"
+    />
+    <label>Apellido</label>
+    <input
+      type="text"
+      name="last_name"
+      placeholder="Ingresa tu Apellido"
+      class="form-control"
+    />
+    <label>Email</label>
+    <input
+      type="email"
+      name="email"
+      placeholder="Ingresa tu mail ejemplo@mail.com"
+      class="form-control"
+    />
+    <label>password</label>
+    <input
+      type="text"
+      name="password"
+      placeholder="Ingresa tu contraseña"
+      class="form-control"
+    />
+    <button class="btn btn-outline-dark w-100 mt-3">Enviar</button>
+  </form>
+</main>
+
+<script async src="/public/register.js"></script>

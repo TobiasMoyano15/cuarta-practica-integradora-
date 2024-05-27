@@ -1,37 +1,35 @@
-import fs from 'node:fs'
-import { __dirname } from '../FileNameUtil'
+// CRUD en mongo
+import productsModel from "./models/products.model.js";
 
-const path = `${__dirname}/FS-Database/products.json`;
-class ProductManager {
-    
 
-    constructor(path) {
-        this.path = path;
-        
+
+class ProductsMongoManager {
+    constructor() {
+        this.productsModel = productsModel;
     }
-    readProductsJson = async () => {
-        try {
-            const productsJson = await fs.promises.readFile(this.path, 'utf-8');
-            return JSON.parse(productsJson);
-        } catch (error) {
-            return [];
+
+    getProducts = async ({ limit = 10, pageNum = 1, sortByPrice, category, status, title }) => {
+        let query = {}
+        if (category) {
+            query = { category:category };
+        }
+        if (status) {
+            query = { status:status };
+        }
+        if (title) {
+            query = { title: title };
         }
         
+        let toSortedByPrice = {}
+        if (sortByPrice){
+            toSortedByPrice = {price: parseInt(sortByPrice)}
+        }
+        
+        return await this.productsModel.paginate(query, { limit: limit, page: pageNum, lean: true, sort: toSortedByPrice });
     }
 
-    writeProduct = async (productsData) => {
-        await fs.promises.writeFile(this.path, JSON.stringify(productsData, null, '\t'), 'utf-8');
-    }
-    
-    getProducts = async () => {
-        return await this.readProductsJson();
-    }
- 
-    
     addProduct = async (title, description, code, price, status, stock, category, thumbnails = './images/IMG_placeholder.jpg') => {
-        try {
-        const product = {
-            id: await this.getNextId(),
+        const newProduct = {
             title: title,
             description: description,
             code: code,
@@ -40,118 +38,151 @@ class ProductManager {
             stock: stock,
             category: category,
             thumbnails: thumbnails
-        };
-        
-        const productsData = await this.readProductsJson();
-
-        const codeExistsCheck = productsData.find((prod) => prod.code === code);
-        
-        const completeProductCheck = [];
-        for (const prop in product) {
-            if (!product[prop]) {
-                completeProductCheck.push(prop);
-            }
         }
-        
+        try {
+            return await this.productsModel.collection.insertOne(newProduct);
 
-        if (!product.title || !product.description || !product.code || !product.price || !product.stock || !product.category) {
-            if(completeProductCheck.length > 1) 
-                throw new Error(`¡ERROR! debe llenar todods los campos del producto nuevo\nFaltaron agregar ${completeProductCheck.join(', ')}`);
-            
-            throw new Error(`¡ERROR! debe llenar todods los campos del producto nuevo\nFaltó agregar ${completeProductCheck.join(', ')}`);
-               
-        };
-
-        if (typeof title !== 'string' || typeof description !== 'string' || typeof code !== 'string' || typeof category !== 'string' || typeof thumbnails !== 'string') {
-            throw new Error("title, description, thumbnails, y code deben ser string");
-        }
-
-        if (typeof price !== 'number' || typeof stock !== 'number') {
-            throw new Error("price y stock deben ser numeros");
-        }
-
-        if (typeof status !== 'boolean') {
-            throw new Error("status debe ser booleano");
-        }
-        
-        if (codeExistsCheck){
-            throw new Error(`¡ERROR! Producto ${product.title} no agregado\nEl código ${product.code} ya está siendo utlizado por el producto ${codeExistsCheck.title}, con el id ${codeExistsCheck.id}`);
-        }; 
-            
-            productsData.push(product);
-            this.writeProduct(productsData)
-            return productsData
-            
         } catch (error) {
-            return error;
+            throw error
         }
-            
-    };
-    
+    }
     getProductsById = async (productId) => {
-        try {
-            const productsData = await this.readProductsJson();
-
-            const idCheck = productsData.find((prod) => prod.id === productId);
-            
-              return idCheck;
-
-        } 
-    
-          catch (error) {
-            return error;
-            
-          }
-    };   
-
+        return await this.productsModel.findOne({ _id: productId }).lean();
+    }
     updateProduct = async (productId, updatedProduct) => {
-        try {
-            const productsData = await this.readProductsJson();
-            const productIndex = await productsData.findIndex(product => product.id === productId);
-
-            if(await productIndex === -1){
-                throw new Error(`El Producto con el id: ${productId} no existe`);
-            }
-            
-            const newUpdatedProduct = {
-                ...productsData[productIndex],
-                ...updatedProduct
-            };
-            
-            productsData[productIndex] = newUpdatedProduct;
-            
-            
-            this.writeProduct(productsData)
-            return productsData;
-
-            
-        } catch (error) {
-            
-            throw new Error('Error', error)
-        }
-
+        return await this.productsModel.updateOne({ _id: productId }, { $set: updatedProduct });
+    }
+    deleteProduct = async (productId) => {
+        return await this.productsModel.deleteOne({ _id: productId });
     }
 
-    deleteProduct = async (productId) => {
-        const productsData = await this.readProductsJson();
-        
-        const productToDeleteIndex = productsData.findIndex(product => product.id === productId);
-        if (productToDeleteIndex === -1) {
-            return `No existe el producto con id: ${productId}`;
-        }
-        console.log(`EL producto ${productsData[productToDeleteIndex].title} con el id ${productId} fue eliminado`);
-        productsData.splice(productToDeleteIndex, 1);
-        this.writeProduct(productsData)
-        };   
-    
-        
-    getNextId = async () => {
-        const productsData = await this.readProductsJson();
-            if (productsData.length === 0) {
-                return 1;
-              };
-              return productsData[productsData.length -1].id + 1;
-    };
-};
 
-export default ProductManager;
+}
+
+// temporal para insertar mas productos
+const productosmuchos = [
+    {
+        "title": "Té-01",
+        "description": "té-01 Descripción",
+        "code": "TEA001",
+        "price": 215,
+        "status": true,
+        "stock": 30,
+        "category": "te",
+        "thumbnails": "./images/IMG_placeholder.jpg"
+    },
+    {
+        "title": "Té-02",
+        "description": "té-02 Descripción",
+        "code": "TEA002",
+        "price": 215,
+        "status": true,
+        "stock": 30,
+        "category": "te",
+        "thumbnails": "./images/IMG_placeholder.jpg"
+    },
+    {
+        "title": "Té-03",
+        "description": "té-03 Descripción",
+        "code": "TEA003",
+        "price": 215,
+        "status": true,
+        "stock": 30,
+        "category": "te",
+        "thumbnails": "./images/IMG_placeholder.jpg"
+    },
+    {
+        "title": "Té-04",
+        "description": "té-04 Descripción",
+        "code": "TEA004",
+        "price": 215,
+        "status": true,
+        "stock": 30,
+        "category": "te",
+        "thumbnails": "./images/IMG_placeholder.jpg"
+    },
+    {
+        "title": "Muffin-01",
+        "description": "Muffin-01 Descripción",
+        "code": "EAT001",
+        "price": 215,
+        "status": true,
+        "stock": 30,
+        "category": "comestibles",
+        "thumbnails": "./images/IMG_placeholder.jpg"
+    },
+    {
+        "title": "Muffin-02",
+        "description": "Muffin-02 Descripción",
+        "code": "EAT002",
+        "price": 215,
+        "status": true,
+        "stock": 30,
+        "category": "comestibles",
+        "thumbnails": "./images/IMG_placeholder.jpg"
+    },
+    {
+        "title": "Muffin-03",
+        "description": "Muffin-03 Descripción",
+        "code": "EAT003",
+        "price": 215,
+        "status": true,
+        "stock": 30,
+        "category": "comestibles",
+        "thumbnails": "./images/IMG_placeholder.jpg"
+    },
+    {
+        "title": "Muffin-04",
+        "description": "Muffin-04 Descripción",
+        "code": "EAT004",
+        "price": 215,
+        "status": true,
+        "stock": 30,
+        "category": "comestibles",
+        "thumbnails": "./images/IMG_placeholder.jpg"
+    },
+    {
+        "title": "Jugo-01",
+        "description": "Jugo-01 Descripción",
+        "code": "JUI001",
+        "price": 215,
+        "status": true,
+        "stock": 30,
+        "category": "jugos",
+        "thumbnails": "./images/IMG_placeholder.jpg"
+    },
+    {
+        "title": "Jugo-02",
+        "description": "Jugo-02 Descripción",
+        "code": "JUI002",
+        "price": 215,
+        "status": true,
+        "stock": 30,
+        "category": "jugos",
+        "thumbnails": "./images/IMG_placeholder.jpg"
+    },
+    {
+        "title": "Jugo-03",
+        "description": "Jugo-03 Descripción",
+        "code": "JUI003",
+        "price": 215,
+        "status": true,
+        "stock": 30,
+        "category": "jugos",
+        "thumbnails": "./images/IMG_placeholder.jpg"
+    },
+    {
+        "title": "Jugo-04",
+        "description": "Jugo-04 Descripción",
+        "code": "JUI004",
+        "price": 215,
+        "status": true,
+        "stock": 30,
+        "category": "jugos",
+        "thumbnails": "./images/IMG_placeholder.jpg"
+    },
+]
+
+
+
+export default ProductsMongoManager

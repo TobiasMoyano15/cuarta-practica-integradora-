@@ -1,6 +1,9 @@
 import { Schema, model } from 'mongoose'
 
 const cartsSchema = new Schema({
+    // userId: String
+    // userEmail: String
+        
     products: [{
         product:{
             type: Schema.Types.ObjectId,

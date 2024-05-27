@@ -1,4 +1,4 @@
-import {chatsModel} from './models/message.mode'
+import {chatsModel} from './models/chat.model.js'
 
 class ChatMongoManager {
 
