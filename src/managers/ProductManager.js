@@ -1,7 +1,7 @@
 import fs from "fs";
 
 class ProductManager {
-#path = "./src/products.json";
+#path = "../src/products.json";
 
 
 constructor() {}

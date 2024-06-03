@@ -1,7 +1,7 @@
 import express from "express";
 import handlebars from "express-handlebars";
 import { Server } from "socket.io";
-import connectMongoDB from './config/db.js';
+import connectMongoDB from '../config/db.js';
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import { __dirname } from "../filenameUtils.js";

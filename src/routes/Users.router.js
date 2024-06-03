@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import {usersModel} from'../dao/models/usermodel'
+import {usersModel} from'../dao/models/UsersMongo.js'
 
 const router = Router()
 

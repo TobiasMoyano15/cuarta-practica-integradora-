@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { __dirname } from '../FileNameUtil.js';
+import { __dirname, uploader } from './util/FileNameUtil.js';
 import CartsMongoManager from '../dao/CartMongo.manager.js';
-import ProductsMongoManager from '../dao/ProductsMongo.manager.jss';
+import ProductsMongo from './dao/ProductsMongo.js';
 
 
 const router = Router();

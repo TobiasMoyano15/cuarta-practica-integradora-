@@ -1,59 +1,124 @@
 [
-  {
-    "id": "3cd45b83-63bf-4f9e-87dc-c64770d66c3f",
-    "code": 111,
-    "title": "producto prueba 1",
-    "description": "Este es un producto prueba",
-    "price": 300,
-    "thumbnail": "Sin imagen",
-    "stock": 25
-  },
-  {
-    "id": "0d4c5f95-0dd4-40fc-bb50-4a8f3e4aa48a",
-    "code": 112,
-    "title": "producto prueba 2",
-    "description": "Este es un producto prueba",
-    "price": 300,
-    "thumbnail": "Sin imagen",
-    "stock": 25
-  },
-  {
-    "id": "80feed59-d173-4805-8620-4b38f5f3ab5c",
-    "code": 113,
-    "title": "producto prueba 3",
-    "description": "Este es un producto prueba",
-    "price": 300,
-    "thumbnail": "Sin imagen",
-    "stock": 25
-  },
-  {
-    "id": "2a10a2ce-2599-4b21-a721-d8ce32a88d78",
-    "code": 114,
-    "title": "producto prueba 4",
-    "description": "Este es un producto prueba",
-    "price": 300,
-    "thumbnail": "Sin imagen",
-    "stock": 25
-  },
-  {
-    "id": "8d337133-a0e2-4a2c-b1d2-6def53b4dd4e",
-    "code": 115,
-    "title": "producto prueba 5",
-    "description": "Este es un producto prueba",
-    "price": 300,
-    "thumbnail": "Sin imagen",
-    "stock": 25
-  },
-  {
-    "id": "c9a3dd15-eae0-4de1-b40f-0c72d924ec77",
-    "code": 116,
-    "title": "producto prueba 6",
-    "description": "Este es un producto prueba",
-    "price": 300,
-    "thumbnail": "Sin imagen",
-    "stock": 25
-  }
+  
+    {
+        "title": "Remera-01",
+        "description": "Remera-01 Descripción",
+        "code": "REM001",
+        "price": 1500,
+        "status": true,
+        "stock": 20,
+        "category": "remeras",
+        "thumbnails": "./images/remera01.jpg"
+    },
+    {
+        "title": "Remera-02",
+        "description": "Remera-02 Descripción",
+        "code": "REM002",
+        "price": 1600,
+        "status": true,
+        "stock": 15,
+        "category": "remeras",
+        "thumbnails": "./images/remera02.jpg"
+    },
+    {
+        "title": "Remera-03",
+        "description": "Remera-03 Descripción",
+        "code": "REM003",
+        "price": 1700,
+        "status": true,
+        "stock": 25,
+        "category": "remeras",
+        "thumbnails": "./images/remera03.jpg"
+    },
+    {
+        "title": "Remera-04",
+        "description": "Remera-04 Descripción",
+        "code": "REM004",
+        "price": 1800,
+        "status": true,
+        "stock": 30,
+        "category": "remeras",
+        "thumbnails": "./images/remera04.jpg"
+    },
+    {
+        "title": "Buzo-01",
+        "description": "Buzo-01 Descripción",
+        "code": "BUZ001",
+        "price": 2500,
+        "status": true,
+        "stock": 10,
+        "category": "buzos",
+        "thumbnails": "./images/buzo01.jpg"
+    },
+    {
+        "title": "Buzo-02",
+        "description": "Buzo-02 Descripción",
+        "code": "BUZ002",
+        "price": 2600,
+        "status": true,
+        "stock": 12,
+        "category": "buzos",
+        "thumbnails": "./images/buzo02.jpg"
+    },
+    {
+        "title": "Buzo-03",
+        "description": "Buzo-03 Descripción",
+        "code": "BUZ003",
+        "price": 2700,
+        "status": true,
+        "stock": 8,
+        "category": "buzos",
+        "thumbnails": "./images/buzo03.jpg"
+    },
+    {
+        "title": "Buzo-04",
+        "description": "Buzo-04 Descripción",
+        "code": "BUZ004",
+        "price": 2800,
+        "status": true,
+        "stock": 20,
+        "category": "buzos",
+        "thumbnails": "./images/buzo04.jpg"
+    },
+    {
+        "title": "Buzo Estampado-01",
+        "description": "Buzo Estampado-01 Descripción",
+        "code": "BES001",
+        "price": 3000,
+        "status": true,
+        "stock": 5,
+        "category": "buzos estampados",
+        "thumbnails": "./images/buzo_estampado01.jpg"
+    },
+    {
+        "title": "Buzo Estampado-02",
+        "description": "Buzo Estampado-02 Descripción",
+        "code": "BES002",
+        "price": 3100,
+        "status": true,
+        "stock": 7,
+        "category": "buzos estampados",
+        "thumbnails": "./images/buzo_estampado02.jpg"
+    },
+    {
+        "title": "Buzo Estampado-03",
+        "description": "Buzo Estampado-03 Descripción",
+        "code": "BES003",
+        "price": 3200,
+        "status": true,
+        "stock": 6,
+        "category": "buzos estampados",
+        "thumbnails": "./images/buzo_estampado03.jpg"
+    },
+    {
+        "title": "Buzo Estampado-04",
+        "description": "Buzo Estampado-04 Descripción",
+        "code": "BES004",
+        "price": 3300,
+        "status": true,
+        "stock": 10,
+        "category": "buzos estampados",
+        "thumbnails": "./images/buzo_estampado04.jpg"
+    }
 ]
 
-
-  

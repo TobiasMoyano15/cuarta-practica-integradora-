@@ -62,127 +62,126 @@ class ProductsMongoManager {
 // temporal para insertar mas productos
 const productosmuchos = [
     {
-        "title": "Té-01",
-        "description": "té-01 Descripción",
-        "code": "TEA001",
-        "price": 215,
+        "title": "Remera-01",
+        "description": "Remera-01 Descripción",
+        "code": "REM001",
+        "price": 1500,
         "status": true,
-        "stock": 30,
-        "category": "te",
-        "thumbnails": "./images/IMG_placeholder.jpg"
+        "stock": 20,
+        "category": "remeras",
+        "thumbnails": "./images/remera01.jpg"
     },
     {
-        "title": "Té-02",
-        "description": "té-02 Descripción",
-        "code": "TEA002",
-        "price": 215,
+        "title": "Remera-02",
+        "description": "Remera-02 Descripción",
+        "code": "REM002",
+        "price": 1600,
         "status": true,
-        "stock": 30,
-        "category": "te",
-        "thumbnails": "./images/IMG_placeholder.jpg"
+        "stock": 15,
+        "category": "remeras",
+        "thumbnails": "./images/remera02.jpg"
     },
     {
-        "title": "Té-03",
-        "description": "té-03 Descripción",
-        "code": "TEA003",
-        "price": 215,
+        "title": "Remera-03",
+        "description": "Remera-03 Descripción",
+        "code": "REM003",
+        "price": 1700,
         "status": true,
-        "stock": 30,
-        "category": "te",
-        "thumbnails": "./images/IMG_placeholder.jpg"
+        "stock": 25,
+        "category": "remeras",
+        "thumbnails": "./images/remera03.jpg"
     },
     {
-        "title": "Té-04",
-        "description": "té-04 Descripción",
-        "code": "TEA004",
-        "price": 215,
+        "title": "Remera-04",
+        "description": "Remera-04 Descripción",
+        "code": "REM004",
+        "price": 1800,
         "status": true,
         "stock": 30,
-        "category": "te",
-        "thumbnails": "./images/IMG_placeholder.jpg"
+        "category": "remeras",
+        "thumbnails": "./images/remera04.jpg"
     },
     {
-        "title": "Muffin-01",
-        "description": "Muffin-01 Descripción",
-        "code": "EAT001",
-        "price": 215,
+        "title": "Buzo-01",
+        "description": "Buzo-01 Descripción",
+        "code": "BUZ001",
+        "price": 2500,
         "status": true,
-        "stock": 30,
-        "category": "comestibles",
-        "thumbnails": "./images/IMG_placeholder.jpg"
+        "stock": 10,
+        "category": "buzos",
+        "thumbnails": "./images/buzo01.jpg"
     },
     {
-        "title": "Muffin-02",
-        "description": "Muffin-02 Descripción",
-        "code": "EAT002",
-        "price": 215,
+        "title": "Buzo-02",
+        "description": "Buzo-02 Descripción",
+        "code": "BUZ002",
+        "price": 2600,
         "status": true,
-        "stock": 30,
-        "category": "comestibles",
-        "thumbnails": "./images/IMG_placeholder.jpg"
+        "stock": 12,
+        "category": "buzos",
+        "thumbnails": "./images/buzo02.jpg"
     },
     {
-        "title": "Muffin-03",
-        "description": "Muffin-03 Descripción",
-        "code": "EAT003",
-        "price": 215,
+        "title": "Buzo-03",
+        "description": "Buzo-03 Descripción",
+        "code": "BUZ003",
+        "price": 2700,
         "status": true,
-        "stock": 30,
-        "category": "comestibles",
-        "thumbnails": "./images/IMG_placeholder.jpg"
+        "stock": 8,
+        "category": "buzos",
+        "thumbnails": "./images/buzo03.jpg"
     },
     {
-        "title": "Muffin-04",
-        "description": "Muffin-04 Descripción",
-        "code": "EAT004",
-        "price": 215,
+        "title": "Buzo-04",
+        "description": "Buzo-04 Descripción",
+        "code": "BUZ004",
+        "price": 2800,
         "status": true,
-        "stock": 30,
-        "category": "comestibles",
-        "thumbnails": "./images/IMG_placeholder.jpg"
+        "stock": 20,
+        "category": "buzos",
+        "thumbnails": "./images/buzo04.jpg"
     },
     {
-        "title": "Jugo-01",
-        "description": "Jugo-01 Descripción",
-        "code": "JUI001",
-        "price": 215,
+        "title": "Buzo Estampado-01",
+        "description": "Buzo Estampado-01 Descripción",
+        "code": "BES001",
+        "price": 3000,
         "status": true,
-        "stock": 30,
-        "category": "jugos",
-        "thumbnails": "./images/IMG_placeholder.jpg"
+        "stock": 5,
+        "category": "buzos estampados",
+        "thumbnails": "./images/buzo_estampado01.jpg"
     },
     {
-        "title": "Jugo-02",
-        "description": "Jugo-02 Descripción",
-        "code": "JUI002",
-        "price": 215,
+        "title": "Buzo Estampado-02",
+        "description": "Buzo Estampado-02 Descripción",
+        "code": "BES002",
+        "price": 3100,
         "status": true,
-        "stock": 30,
-        "category": "jugos",
-        "thumbnails": "./images/IMG_placeholder.jpg"
+        "stock": 7,
+        "category": "buzos estampados",
+        "thumbnails": "./images/buzo_estampado02.jpg"
     },
     {
-        "title": "Jugo-03",
-        "description": "Jugo-03 Descripción",
-        "code": "JUI003",
-        "price": 215,
+        "title": "Buzo Estampado-03",
+        "description": "Buzo Estampado-03 Descripción",
+        "code": "BES003",
+        "price": 3200,
         "status": true,
-        "stock": 30,
-        "category": "jugos",
-        "thumbnails": "./images/IMG_placeholder.jpg"
+        "stock": 6,
+        "category": "buzos estampados",
+        "thumbnails": "./images/buzo_estampado03.jpg"
     },
     {
-        "title": "Jugo-04",
-        "description": "Jugo-04 Descripción",
-        "code": "JUI004",
-        "price": 215,
+        "title": "Buzo Estampado-04",
+        "description": "Buzo Estampado-04 Descripción",
+        "code": "BES004",
+        "price": 3300,
         "status": true,
-        "stock": 30,
-        "category": "jugos",
-        "thumbnails": "./images/IMG_placeholder.jpg"
-    },
-]
-
+        "stock": 10,
+        "category": "buzos estampados",
+        "thumbnails": "./images/buzo_estampado04.jpg"
+    }
+];
 
 
 export default ProductsMongoManager

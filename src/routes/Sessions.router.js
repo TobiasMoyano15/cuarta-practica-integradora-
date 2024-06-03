@@ -57,7 +57,7 @@ sessionsRouter.post('/login', async (req, res) => {
     };
 
     console.log(req.session.user);
-    res.redirect('/products');
+    res.redirect('../products');
 });
 
 
