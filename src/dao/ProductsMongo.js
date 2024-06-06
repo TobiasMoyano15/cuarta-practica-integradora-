@@ -1,30 +1,28 @@
 import productModel from '../models/productModel.js';
 
-
-
 class ProductsMongoManager {
     constructor() {
-        this.productsModel = productsModel;
+        this.productModel = productModel;
     }
 
     getProducts = async ({ limit = 10, pageNum = 1, sortByPrice, category, status, title }) => {
-        let query = {}
+        let query = {};
         if (category) {
-            query = { category:category };
+            query.category = category;
         }
         if (status) {
-            query = { status:status };
+            query.status = status;
         }
         if (title) {
-            query = { title: title };
+            query.title = { $regex: title, $options: 'i' };
         }
-        
-        let toSortedByPrice = {}
-        if (sortByPrice){
-            toSortedByPrice = {price: parseInt(sortByPrice)}
+
+        let toSortedByPrice = {};
+        if (sortByPrice) {
+            toSortedByPrice = { price: parseInt(sortByPrice) };
         }
-        
-        return await this.productsModel.paginate(query, { limit: limit, page: pageNum, lean: true, sort: toSortedByPrice });
+
+        return await this.productModel.paginate(query, { limit: limit, page: pageNum, lean: true, sort: toSortedByPrice });
     }
 
     addProduct = async (title, description, code, price, status, stock, category, thumbnails = './images/IMG_placeholder.jpg') => {
@@ -37,28 +35,28 @@ class ProductsMongoManager {
             stock: stock,
             category: category,
             thumbnails: thumbnails
-        }
+        };
         try {
-            return await this.productsModel.collection.insertOne(newProduct);
-
+            return await this.productModel.collection.insertOne(newProduct);
         } catch (error) {
-            throw error
+            throw error;
         }
     }
+
     getProductsById = async (productId) => {
-        return await this.productsModel.findOne({ _id: productId }).lean();
+        return await this.productModel.findOne({ _id: productId }).lean();
     }
+
     updateProduct = async (productId, updatedProduct) => {
-        return await this.productsModel.updateOne({ _id: productId }, { $set: updatedProduct });
+        return await this.productModel.updateOne({ _id: productId }, { $set: updatedProduct });
     }
+
     deleteProduct = async (productId) => {
-        return await this.productsModel.deleteOne({ _id: productId });
+        return await this.productModel.deleteOne({ _id: productId });
     }
-
-
 }
 
-// temporal para insertar mas productos
+// Temporal para insertar más productos
 const productosmuchos = [
     {
         "title": "Remera-01",
@@ -182,8 +180,4 @@ const productosmuchos = [
     }
 ];
 
-
-
-
-
-export default ProductsMongoManager
+export default ProductsMongo;

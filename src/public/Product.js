@@ -8,8 +8,7 @@ addToCartBtn.addEventListener('click', async () => {
     console.log(productId);
     console.log(productTitle);
     try {
-
-        const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
+        const response = await fetch(`/api/cart/${cartId}/products/${productId}`, { // Cambio aquí
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

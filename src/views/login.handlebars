@@ -5,7 +5,7 @@
       {{error}}
     </div>
   {{/if}}
-  <form action="/api/sessions/login" method="POST" class="form-group w-50">
+  <form id="loginForm" action="/api/sessions/login" method="POST" class="form-group w-50">
     <div class="container">
       <label>Email</label>
       <input
@@ -14,9 +14,9 @@
         placeholder="Ingresa tu mail ejemplo@mail.com"
         class="form-control"
       />
-      <label>password</label>
+      <label>Password</label>
       <input
-        type="text"
+        type="password"
         name="password"
         placeholder="Ingresa tu contraseña"
         class="form-control"
@@ -36,5 +36,9 @@
       >Registrate</button>
     </div>
   </form>
+  <div>
+    <a class="btn btn-dark w-50 mt-3" href="/api/sessions/github">Inicia sesión con Github</a>
+  </div>
 </main>
-<script async src="../public/Login.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.all.min.js"></script>
+<script async src="/js/login.js"></script>

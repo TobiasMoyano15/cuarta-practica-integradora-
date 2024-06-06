@@ -4,7 +4,8 @@ import { Server } from "socket.io";
 import connectMongoDB from '../config/db.js';
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import { __dirname } from "../filenameUtils.js";
+import { dirname } from "path";
+import { fileURLToPath } from 'url';
 import { productsSocket } from '../src/util/productsSocket.js';
 import ProductManager from "../src/dao/ProductsFS.manager.js";
 import ChatMongoManager from "../src/dao/ChatMongo.manager.js";
@@ -17,6 +18,9 @@ import chatRouter from "../src/routes/ChatRouter.js";
 import { sessionsRouter } from "../src/routes/Sessions.router.js";
 import MongoStore from "connect-mongo";
 
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const productsJsonPath = `${__dirname}/FS-Database/Products.json`;
 const productManager = new ProductManager(productsJsonPath);
@@ -40,8 +44,7 @@ app.use(cookieParser('F1rmas3cr3t@'));
 app.use(session({
     store: MongoStore.create({
         mongoUrl: 'mongodb+srv://zieglering:bX5FNTpfWgkHOvE0@cluster0.vxpuioi.mongodb.net/ecommerce',
-        mongoOptions: {
-        },
+        mongoOptions: {},
         ttl: 60 * 60 * 1000 * 24
     }),
     secret: 'F1rmas3cr3t@',
@@ -51,8 +54,7 @@ app.use(session({
 
 connectMongoDB();
 
-
-app.engine(".hbs", handlebars.engine({
+app.engine(".hbs", handlebars({
     extname: '.hbs'
 }));
 
@@ -99,13 +101,10 @@ io.on("connection", async (socket) => {
 
     socket.on("updateProduct", async (productID, updatedProduct) => {
         try {
-
             await productManager.updateProduct(parseInt(productID), updatedProduct);
             io.emit("getProducts", await productManager.getProducts());
-
         } catch (error) {
             console.error("Error", error);
-
         }
     });
 
@@ -113,16 +112,13 @@ io.on("connection", async (socket) => {
         try {
             await productManager.deleteProduct(parseInt(await productID));
             io.emit("getProducts", await productManager.getProducts());
-
         } catch (error) {
             console.error("Error", error);
-
         }
     });
 
     // Chat socket
     let messages = [];
-
     try {
         messages = await chatMongoManager.getMessages();
         socket.emit('messageLog', messages);

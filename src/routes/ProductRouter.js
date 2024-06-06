@@ -1,9 +1,8 @@
 import { Router } from 'express';
-import ProductsMongo from '../dao/ProductsMongo'
-
+import ProductsMongo from '../dao/ProductsMongo';
 
 const router = Router();
-const productService = new ProductsMongoManager;
+const productService = new ProductsMongo();
 
 router.get('/', async (req, res) => {
     try {
@@ -99,6 +98,5 @@ router.delete('/:pid', async (req, res) => {
     productService.deleteProduct(pid);
 
 });
-
 
 export default router;

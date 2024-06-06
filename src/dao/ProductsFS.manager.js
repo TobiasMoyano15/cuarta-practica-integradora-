@@ -1,35 +1,38 @@
-// CRUD en mongo
-import productsModel from "./models/products.model.js";
+// CRUD en Archivos (Files System)
+import fs from 'node:fs'
+import { __dirname } from '../filenameUtils.js'
 
+const path = `${__dirname}/FS-Database/Products.json`;
+class ProductManager {
+    
 
-
-class ProductsMongoManager {
-    constructor() {
-        this.productsModel = productsModel;
+    constructor(path) {
+        this.path = path;
+        
     }
-
-    getProducts = async ({ limit = 10, pageNum = 1, sortByPrice, category, status, title }) => {
-        let query = {}
-        if (category) {
-            query = { category:category };
-        }
-        if (status) {
-            query = { status:status };
-        }
-        if (title) {
-            query = { title: title };
+    readProductsJson = async () => {
+        try {
+            const productsJson = await fs.promises.readFile(this.path, 'utf-8');
+            return JSON.parse(productsJson);
+        } catch (error) {
+            return [];
         }
         
-        let toSortedByPrice = {}
-        if (sortByPrice){
-            toSortedByPrice = {price: parseInt(sortByPrice)}
-        }
-        
-        return await this.productsModel.paginate(query, { limit: limit, page: pageNum, lean: true, sort: toSortedByPrice });
     }
 
+    writeProduct = async (productsData) => {
+        await fs.promises.writeFile(this.path, JSON.stringify(productsData, null, '\t'), 'utf-8');
+    }
+    
+    getProducts = async () => {
+        return await this.readProductsJson();
+    }
+ 
+    
     addProduct = async (title, description, code, price, status, stock, category, thumbnails = './images/IMG_placeholder.jpg') => {
-        const newProduct = {
+        try {
+        const product = {
+            id: await this.getNextId(),
             title: title,
             description: description,
             code: code,
@@ -38,150 +41,118 @@ class ProductsMongoManager {
             stock: stock,
             category: category,
             thumbnails: thumbnails
-        }
-        try {
-            return await this.productsModel.collection.insertOne(newProduct);
+        };
+        
+        const productsData = await this.readProductsJson();
 
+        const codeExistsCheck = productsData.find((prod) => prod.code === code);
+        
+        const completeProductCheck = [];
+        for (const prop in product) {
+            if (!product[prop]) {
+                completeProductCheck.push(prop);
+            }
+        }
+        
+
+        if (!product.title || !product.description || !product.code || !product.price || !product.stock || !product.category) {
+            if(completeProductCheck.length > 1) 
+                throw new Error(`¡ERROR! debe llenar todods los campos del producto nuevo\nFaltaron agregar ${completeProductCheck.join(', ')}`);
+            
+            throw new Error(`¡ERROR! debe llenar todods los campos del producto nuevo\nFaltó agregar ${completeProductCheck.join(', ')}`);
+               
+        };
+
+        if (typeof title !== 'string' || typeof description !== 'string' || typeof code !== 'string' || typeof category !== 'string' || typeof thumbnails !== 'string') {
+            throw new Error("title, description, thumbnails, y code deben ser string");
+        }
+
+        if (typeof price !== 'number' || typeof stock !== 'number') {
+            throw new Error("price y stock deben ser numeros");
+        }
+
+        if (typeof status !== 'boolean') {
+            throw new Error("status debe ser booleano");
+        }
+        
+        if (codeExistsCheck){
+            throw new Error(`¡ERROR! Producto ${product.title} no agregado\nEl código ${product.code} ya está siendo utlizado por el producto ${codeExistsCheck.title}, con el id ${codeExistsCheck.id}`);
+        }; 
+            
+            productsData.push(product);
+            this.writeProduct(productsData)
+            return productsData
+            
         } catch (error) {
-            throw error
+            return error;
         }
-    }
+            
+    };
+    
     getProductsById = async (productId) => {
-        return await this.productsModel.findOne({ _id: productId }).lean();
-    }
+        try {
+            const productsData = await this.readProductsJson();
+
+            const idCheck = productsData.find((prod) => prod.id === productId);
+            
+              return idCheck;
+
+        } 
+    
+          catch (error) {
+            return error;
+            
+          }
+    };   
+
     updateProduct = async (productId, updatedProduct) => {
-        return await this.productsModel.updateOne({ _id: productId }, { $set: updatedProduct });
+        try {
+            const productsData = await this.readProductsJson();
+            const productIndex = await productsData.findIndex(product => product.id === productId);
+
+            if(await productIndex === -1){
+                throw new Error(`El Producto con el id: ${productId} no existe`);
+            }
+            
+            const newUpdatedProduct = {
+                ...productsData[productIndex],
+                ...updatedProduct
+            };
+            
+            productsData[productIndex] = newUpdatedProduct;
+            
+            
+            this.writeProduct(productsData)
+            return productsData;
+
+            
+        } catch (error) {
+            
+            throw new Error('Error', error)
+        }
+
     }
+
     deleteProduct = async (productId) => {
-        return await this.productsModel.deleteOne({ _id: productId });
-    }
+        const productsData = await this.readProductsJson();
+        
+        const productToDeleteIndex = productsData.findIndex(product => product.id === productId);
+        if (productToDeleteIndex === -1) {
+            return `No existe el producto con id: ${productId}`;
+        }
+        console.log(`EL producto ${productsData[productToDeleteIndex].title} con el id ${productId} fue eliminado`);
+        productsData.splice(productToDeleteIndex, 1);
+        this.writeProduct(productsData)
+        };   
+    
+        
+    getNextId = async () => {
+        const productsData = await this.readProductsJson();
+            if (productsData.length === 0) {
+                return 1;
+              };
+              return productsData[productsData.length -1].id + 1;
+    };
+};
 
-
-}
-
-// temporal para insertar mas productos
-const productosmuchos = [
-    {
-        "title": "Remera-01",
-        "description": "Remera-01 Descripción",
-        "code": "REM001",
-        "price": 1500,
-        "status": true,
-        "stock": 20,
-        "category": "remeras",
-        "thumbnails": "./images/remera01.jpg"
-    },
-    {
-        "title": "Remera-02",
-        "description": "Remera-02 Descripción",
-        "code": "REM002",
-        "price": 1600,
-        "status": true,
-        "stock": 15,
-        "category": "remeras",
-        "thumbnails": "./images/remera02.jpg"
-    },
-    {
-        "title": "Remera-03",
-        "description": "Remera-03 Descripción",
-        "code": "REM003",
-        "price": 1700,
-        "status": true,
-        "stock": 25,
-        "category": "remeras",
-        "thumbnails": "./images/remera03.jpg"
-    },
-    {
-        "title": "Remera-04",
-        "description": "Remera-04 Descripción",
-        "code": "REM004",
-        "price": 1800,
-        "status": true,
-        "stock": 30,
-        "category": "remeras",
-        "thumbnails": "./images/remera04.jpg"
-    },
-    {
-        "title": "Buzo-01",
-        "description": "Buzo-01 Descripción",
-        "code": "BUZ001",
-        "price": 2500,
-        "status": true,
-        "stock": 10,
-        "category": "buzos",
-        "thumbnails": "./images/buzo01.jpg"
-    },
-    {
-        "title": "Buzo-02",
-        "description": "Buzo-02 Descripción",
-        "code": "BUZ002",
-        "price": 2600,
-        "status": true,
-        "stock": 12,
-        "category": "buzos",
-        "thumbnails": "./images/buzo02.jpg"
-    },
-    {
-        "title": "Buzo-03",
-        "description": "Buzo-03 Descripción",
-        "code": "BUZ003",
-        "price": 2700,
-        "status": true,
-        "stock": 8,
-        "category": "buzos",
-        "thumbnails": "./images/buzo03.jpg"
-    },
-    {
-        "title": "Buzo-04",
-        "description": "Buzo-04 Descripción",
-        "code": "BUZ004",
-        "price": 2800,
-        "status": true,
-        "stock": 20,
-        "category": "buzos",
-        "thumbnails": "./images/buzo04.jpg"
-    },
-    {
-        "title": "Buzo Estampado-01",
-        "description": "Buzo Estampado-01 Descripción",
-        "code": "BES001",
-        "price": 3000,
-        "status": true,
-        "stock": 5,
-        "category": "buzos estampados",
-        "thumbnails": "./images/buzo_estampado01.jpg"
-    },
-    {
-        "title": "Buzo Estampado-02",
-        "description": "Buzo Estampado-02 Descripción",
-        "code": "BES002",
-        "price": 3100,
-        "status": true,
-        "stock": 7,
-        "category": "buzos estampados",
-        "thumbnails": "./images/buzo_estampado02.jpg"
-    },
-    {
-        "title": "Buzo Estampado-03",
-        "description": "Buzo Estampado-03 Descripción",
-        "code": "BES003",
-        "price": 3200,
-        "status": true,
-        "stock": 6,
-        "category": "buzos estampados",
-        "thumbnails": "./images/buzo_estampado03.jpg"
-    },
-    {
-        "title": "Buzo Estampado-04",
-        "description": "Buzo Estampado-04 Descripción",
-        "code": "BES004",
-        "price": 3300,
-        "status": true,
-        "stock": 10,
-        "category": "buzos estampados",
-        "thumbnails": "./images/buzo_estampado04.jpg"
-    }
-];
-
-
-export default ProductsMongoManager
+export default ProductFSManager;

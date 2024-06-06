@@ -17,10 +17,11 @@ const userSchema = new Schema({
     password: String,
     role: {
         type: String,
+        emum: ['user', 'admin'],
         default: 'user'
     }
 });
 
 userSchema.plugin(mongoosePaginate);
 
-export const userModel = model(userCollection, userSchema);
+export const usermodel = model(userCollection, userSchema);

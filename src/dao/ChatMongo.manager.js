@@ -1,34 +1,30 @@
-import {chatsModel} from './models/chat.model.js'
+import chatmodel from './models/chatmodel.js';
 
 class ChatMongoManager {
-
     constructor() {
-        this.chatsModel = chatsModel
+        this.chatmodel = chatmodel;
     }
-    
-    getMessages = async() => {
-        try {
-            return await chatsModel.find();
-        
-        } catch (error) {
-            throw error
-        }
-    }
-    
-    addMessage = async(user, message) => {
-        const newMessage = {
-            user:user,
-            message:message
-        }
-        try {
-            console.log(newMessage)
-            return  await chatsModel.create(newMessage);
 
-            
+    getMessages = async () => {
+        try {
+            return await this.chatmodel.find();
         } catch (error) {
-            throw error
+            throw error;
+        }
+    }
+
+    addMessage = async (user, message) => {
+        const newMessage = {
+            user: user,
+            message: message
+        };
+        try {
+            console.log(newMessage);
+            return await this.chatmodel.create(newMessage);
+        } catch (error) {
+            throw error;
         }
     }
 }
 
-export default ChatMongoManager
+export default ChatMongoManager;
