@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import ProductsMongo from '../dao/ProductsMongo';
+import ProductsMongo from '../dao/ProductsMongo.js';
 
 const router = Router();
 const productService = new ProductsMongo();
@@ -24,6 +24,7 @@ router.get('/', async (req, res) => {
         if (hasNextPage) {
             nextLink = `/products?pageNum=${nextPage}`;
             if (limit) nextLink += `&limit=${limit}`;
+            if (title) nextLink += `&title=${title}`;
             if (category) nextLink += `&category=${category}`;
             if (status) nextLink += `&status=${status}`;
             if (sortByPrice) nextLink += `&sortByPrice=${sortByPrice}`;
@@ -48,55 +49,76 @@ router.get('/', async (req, res) => {
     }
 });
 
-
 router.post('/', async (req, res) => {
-    const { title, description, code, price, status = true, stock, category, thumbnails } = req.body;
-    const products = await productService.getProducts();
+    try {
+        const { title, description, code, price, status = true, stock, category, thumbnails } = req.body;
+        const products = await productService.getProducts();
 
-    if (!title || !description || !code || !price || !stock || !category)
-        return res.status(400).send({ status: 'error', error: 'faltan campos' });
+        if (!title || !description || !code || !price || !stock || !category) {
+            return res.status(400).send({ status: 'error', error: 'Faltan campos' });
+        }
 
-    if (products.find((prod) => prod.code === code))
-        return res.status(400).send({ status: 'error', error: `No se pudo agregar el producto con el código ${code} porque ya existe un producto con ese código` });
+        if (products.find((prod) => prod.code === code)) {
+            return res.status(400).send({ status: 'error', error: `No se pudo agregar el producto con el código ${code} porque ya existe un producto con ese código` });
+        }
 
-    const newProduct = await productService.addProduct(title, description, code, price, status, stock, category, thumbnails);
-    res.status(201).send({ status: 'success', payload: newProduct });
+        const newProduct = await productService.addProduct({ title, description, code, price, status, stock, category, thumbnails });
+        res.status(201).send({ status: 'success', payload: newProduct });
+    } catch (error) {
+        res.status(500).send({ status: 'error', error: 'No se pudo agregar el producto' });
+    }
 });
 
 router.get('/:pid', async (req, res) => {
-    const { pid } = req.params;
-    const productFound = await productService.getProductsById(pid);
+    try {
+        const { pid } = req.params;
+        const productFound = await productService.getProductsById(pid);
 
-    if (!productFound)
-        return res.status(400).send({ status: 'error', error: `¡ERROR! No existe ningún producto con el id ${pid}` });
+        if (!productFound) {
+            return res.status(404).send({ status: 'error', error: `¡ERROR! No existe ningún producto con el id ${pid}` });
+        }
 
-    res.status(200).send({ status: 'success', payload: productFound });
+        res.status(200).send({ status: 'success', payload: productFound });
+    } catch (error) {
+        res.status(500).send({ status: 'error', error: 'No se pudo obtener el producto' });
+    }
 });
 
 router.put('/:pid', async (req, res) => {
-    const { pid } = req.params;
-    const { title, description, code, price, status = true, stock, category, thumbnails } = req.body;
-    const productFound = await productService.getProductsById(pid);
+    try {
+        const { pid } = req.params;
+        const { title, description, code, price, status = true, stock, category, thumbnails } = req.body;
+        const productFound = await productService.getProductsById(pid);
 
-    if (!title || !description || !code || !price || !stock || !category) {
-        return res.status(400).send({ status: 'error', error: 'faltan campos' });
+        if (!title || !description || !code || !price || !stock || !category) {
+            return res.status(400).send({ status: 'error', error: 'Faltan campos' });
+        }
+
+        if (!productFound) {
+            return res.status(404).send({ status: 'error', error: `No existe el producto con el id ${pid}` });
+        }
+
+        const updatedProduct = await productService.updateProduct(pid, { title, description, code, price, status, stock, category, thumbnails });
+        res.status(200).send({ status: 'success', payload: updatedProduct });
+    } catch (error) {
+        res.status(500).send({ status: 'error', error: 'No se pudo actualizar el producto' });
     }
-
-    if (!productFound) return res.status(400).send({ status: 'error', error: `No existe el producto con el id ${pid}` });
-
-    const updatedProduct = await productService.updateProduct(pid, { title, description, code, price, status, stock, category, thumbnails });
-    res.status(201).send({ status: 'success', payload: updatedProduct });
 });
 
 router.delete('/:pid', async (req, res) => {
-    const { pid } = req.params;
-    const productFound = await productService.getProductsById(pid);
+    try {
+        const { pid } = req.params;
+        const productFound = await productService.getProductsById(pid);
 
-    if (!productFound) return res.status(400).send({ status: 'error', error: `¡ERROR! No existe ningún producto con el id ${pid}` });
+        if (!productFound) {
+            return res.status(404).send({ status: 'error', error: `¡ERROR! No existe ningún producto con el id ${pid}` });
+        }
 
-    res.status(200).send({ status: 'success', payload: productFound });
-    productService.deleteProduct(pid);
-
+        await productService.deleteProduct(pid);
+        res.status(200).send({ status: 'success', payload: productFound });
+    } catch (error) {
+        res.status(500).send({ status: 'error', error: 'No se pudo eliminar el producto' });
+    }
 });
 
 export default router;

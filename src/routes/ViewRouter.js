@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { __dirname } from '../FileNameUtil.js';
-import ProductsMongoManager from "../dao/ProductsMongo.manager.js";
+import ProductsMongo from "../dao/ProductsMongo.js";
 import CartsMongoManager from "../dao/CartMongo.manager.js";
 import { UsersMongo } from "../dao/UsersMongo.js";
 import { auth } from "../middlewares/auth.middleware.js";
