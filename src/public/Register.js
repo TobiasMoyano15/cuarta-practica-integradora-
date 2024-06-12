@@ -6,7 +6,7 @@ registerForm.addEventListener('submit', async (evt) => {
     const formData = new FormData(registerForm);
     const data = Object.fromEntries(formData.entries());
     try {
-        const response = await fetch('/api/users/register', { // Cambio aquí
+        const response = await fetch('/api/users/register', { // Corregimos la URL
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -20,25 +20,25 @@ registerForm.addEventListener('submit', async (evt) => {
                 text: 'Usuario creado correctamente.',
                 icon: 'success',
                 confirmButtonText: 'OK'
-              }).then(() => {
+            }).then(() => {
                 window.location.href = '/login';
-              });
-            } else {
-              const errorText = await response.json();
-              Swal.fire({
+            });
+        } else {
+            const errorText = await response.json();
+            Swal.fire({
                 title: 'Error!',
                 text: errorText.error,
                 icon: 'error',
                 confirmButtonText: 'OK'
-              });
-            }
-          } catch (error) {
-            console.error('Error:', error);
-            Swal.fire({
-              title: 'Error!',
-              text: 'Ocurrió un error, por favor inténtalo nuevamente.',
-              icon: 'error',
-              confirmButtonText: 'OK'
             });
-          }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Error!',
+            text: 'Ocurrió un error, por favor inténtalo nuevamente.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    }
 });

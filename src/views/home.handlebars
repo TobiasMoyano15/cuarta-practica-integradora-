@@ -1,75 +1,63 @@
 <main class="main">
-  <h1>Bienvenido {{email}} - Rol: {{role}}</h1>
-  <button
-    id="logOutBtn"
-    class="btn btn-outline-danger w-100 mt-3"
-  >Logout</button>
+    <h1>Bienvenido {{email}} - Rol: {{role}}</h1>
+    <button id="logOutBtn" class="btn btn-outline-danger w-100 mt-3">Logout</button>
 
-  <section class="container">
-    <h1>Nuestros cafés</h1>
-    <div>
-      <h2>Categorias</h2>
-      <a href="/products?category=Remeras lisas">Remeras lisas</a>
-      <a href="/products?category=Buxos lisos">Buzos lisos</a>
-      <a href="/products?category=Estampados">Estampados</a>
-      <a href="/products">Todos</a>
-    </div>
-    <div>
-      <h2>Búsqueda de producto</h2>
-      <form action="/products?title={{title}}" method="get">
-        <input type="text" name="product" placeholder="Busca tu producto" />
-        <input type="submit" value="Submit" />
-      </form>
-    </div>
-    <div>
-      <a href="/products?status=true">Disponibles</a>
-      <a href="/products?status=false">No disponibles</a>
-    </div>
-    <div>
-      <h2>Ordenar por precio</h2>
-      <a href="/products?sortByPrice=1&category={{category}}">Ordenar ascendente</a>
-      <a href="/products?sortByPrice=-1&category={{category}}">Ordenar
-        descendente</a>
-    </div>
-    <div>
-      <h2>Productos</h2>
-      <div>
-        <div class="product-grid">
-          {{#each products}}
-            <div class="product-card">
-              <div class="product-image">
-                
-              </div>
-              <div class="product-info">
-                <h2 class="product-title">{{this.title}}</h2>
-                <h3 class="product-price">${{this.price}}</h3>
-              </div>
-              <a href="/product/{{this._id}}"><button
-                  class="product-btn"
-                  data-product-id="{{product._id}}"
-                  data-cart-id="{{cartId}}"
-                >Ver más</button></a>
-            </div>
-          {{/each}}
+    <section class="container">
+        <h1>Nuestros cafés</h1>
+        <div>
+            <h2>Categorias</h2>
+            <a href="/products?category=Remeras lisas">Remeras lisas</a>
+            <a href="/products?category=Buxos lisos">Buzos lisos</a>
+            <a href="/products?category=Estampados">Estampados</a>
+            <a href="/products">Todos</a>
         </div>
-      </div>
-    </div>
-  </section>
-  <section class="container-center">
-    <div class="div-flex">
-      <div class="div-center">
-
-        {{#if hasPrevPage}}
-          <a href={{prevLink}}>Anterior</a>
-        {{/if}}
-        <p>{{page}}</p>
-        {{#if hasNextPage}}
-          <a href={{nextLink}}>Siguiente</a>
-        {{/if}}
-      </div>
-    </div>
-  </section>
+        <div>
+            <h2>Búsqueda de producto</h2>
+            <form action="/products" method="get">
+                <input type="text" name="product" placeholder="Busca tu producto" />
+                <button type="submit">Buscar</button>
+            </form>
+        </div>
+        <div>
+            <a href="/products?status=true">Disponibles</a>
+            <a href="/products?status=false">No disponibles</a>
+        </div>
+        <div>
+            <h2>Ordenar por precio</h2>
+            <a href="/products?sortByPrice=1">Ordenar ascendente</a>
+            <a href="/products?sortByPrice=-1">Ordenar descendente</a>
+        </div>
+        <div>
+            <h2>Productos</h2>
+            <div class="product-grid">
+                {{#each products}}
+                <div class="product-card">
+                    <div class="product-image"></div>
+                    <div class="product-info">
+                        <h2 class="product-title">{{this.title}}</h2>
+                        <h3 class="product-price">${{this.price}}</h3>
+                    </div>
+                    <a href="/product/{{this._id}}">
+                        <button class="product-btn" data-product-id="{{this._id}}" data-cart-id="{{cartId}}">Ver más</button>
+                    </a>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+    </section>
+    <section class="container-center">
+        <div class="div-flex">
+            <div class="div-center">
+                {{#if hasPrevPage}}
+                <a href="{{prevLink}}">Anterior</a>
+                {{/if}}
+                <p>{{page}}</p>
+                {{#if hasNextPage}}
+                <a href="{{nextLink}}">Siguiente</a>
+                {{/if}}
+            </div>
+        </div>
+    </section>
 </main>
-
 
 <script async src="../public/index.js"></script>

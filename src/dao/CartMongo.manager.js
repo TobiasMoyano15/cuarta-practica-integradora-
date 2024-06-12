@@ -1,8 +1,8 @@
-import cartmodel from '../models/cartmodel.js';
+import CartModel from './models/cartmodel.js';
 
 class CartsMongoManager {
     constructor() {
-        this.cartmodel = cartmodel;
+        this.cartmodel = CartModel;
     }
 
     addNewCart = async () => {
@@ -11,7 +11,7 @@ class CartsMongoManager {
         };
         const createdCart = await this.cartmodel.create(cart);
         return createdCart;
-    }
+    };
 
     addProductToCart = async (cartId, product, quantity) => {
         const cartExists = this.cartmodel.where({ _id: cartId, 'products.product': product });
@@ -34,7 +34,6 @@ class CartsMongoManager {
         }
     };
 
-    // Usando un filtro podemos buscar por diferentes propiedades: filter = {_id: cid} o {email: userEmail}
     getCartBy = async (filter) => await this.cartmodel.findOne(filter).lean();
 
     updateProductFromCart = async (cartId, product, quantity) => {
@@ -69,7 +68,7 @@ class CartsMongoManager {
         return newProductInCart;
     };
 
-    deleteProduct = async (cid, pid) => await this.cartmodel.findOneAndUpdate(
+    deleteProductFromCart = async (cid, pid) => await this.cartmodel.findOneAndUpdate(
         { _id: cid },
         { $pull: { products: { product: pid } } },
         { new: true }

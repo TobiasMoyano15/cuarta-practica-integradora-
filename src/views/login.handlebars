@@ -1,44 +1,44 @@
 <main class="container">
-  <h1>Login</h1>
-  {{#if error}}
+    <h1>Login</h1>
+    {{#if error}}
     <div class="alert alert-danger" role="alert">
-      {{error}}
+        {{error}}
     </div>
-  {{/if}}
-  <form id="loginForm" action="/api/sessions/login" method="POST" class="form-group w-50">
-    <div class="container">
-      <label>Email</label>
-      <input
-        type="email"
-        name="email"
-        placeholder="Ingresa tu mail ejemplo@mail.com"
-        class="form-control"
-      />
-      <label>Password</label>
-      <input
-        type="password"
-        name="password"
-        placeholder="Ingresa tu contraseña"
-        class="form-control"
-      />
-      <button
-        type="submit"
-        id="logInBtn"
-        class="btn btn-outline-dark w-100 mt-3"
-      >Login</button>
+    {{/if}}
+    <form id="loginForm" action="/api/sessions/login" method="POST" class="form-group w-50">
+        <div class="container">
+            <label>Email</label>
+            <input
+                type="email"
+                name="email"
+                placeholder="Ingresa tu mail ejemplo@mail.com"
+                class="form-control"
+            />
+            <label>Password</label>
+            <input
+                type="password"
+                name="password"
+                placeholder="Ingresa tu contraseña"
+                class="form-control"
+            />
+            <button
+                type="submit"
+                id="logInBtn"
+                class="btn btn-outline-dark w-100 mt-3"
+            >Login</button>
+        </div>
+        <div class="container mt-3">
+            <label>¿No tienes usuario?</label>
+            <button
+                type="button"
+                id="registerBtn"
+                class="btn btn-outline-dark w-100 mt-3"
+            >Registrate</button>
+        </div>
+    </form>
+    <div>
+        <a class="btn btn-dark w-50 mt-3" href="/api/sessions/github">Inicia sesión con Github</a>
     </div>
-    <div class="container mt-3">
-      <label>¿No tienes usuario?</label>
-      <button
-        type="button"
-        id="registerBtn"
-        class="btn btn-outline-dark w-100 mt-3"
-      >Registrate</button>
-    </div>
-  </form>
-  <div>
-    <a class="btn btn-dark w-50 mt-3" href="/api/sessions/github">Inicia sesión con Github</a>
-  </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.all.min.js"></script>
 <script async src="/js/login.js"></script>

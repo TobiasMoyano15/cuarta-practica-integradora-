@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { UsersManagerMongo } from '../dao/UsersMongo.js';
-import { auth } from '../middlewares/auth.middleware.js';
-import { createHash, isValidPassword } from '../utils/bcrypt.js'; 
+import { createHash, isValidPassword } from '../util/bcrypt.js'; 
 import passport from 'passport';
+import { auth } from '../middlewares/auth.middleware.js';
 
 export const sessionsRouter = Router();
 

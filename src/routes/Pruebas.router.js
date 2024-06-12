@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { auth } from '../middlewares/auth.middleware';
+import { auth } from '../middlewares/auth.middleware.js'; // Ajusta la ruta de importación del middleware
 
 const router = Router();
 
@@ -24,7 +24,7 @@ router.get('/logout', (req, res) => {
     });
 });
 
-// cookies
+// Cookies
 
 router.get('/setCookie', (req, res) => {
     res.cookie('CoderCookie', 'Esta es una cookie muy poderosa', { maxAge: 10000000 }).send('cookie');

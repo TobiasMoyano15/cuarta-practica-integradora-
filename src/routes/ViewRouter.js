@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { __dirname } from '../FileNameUtil.js';
-import ProductsMongo from "../dao/ProductsMongo.js";
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+import ProductsMongoManager from "../dao/ProductsMongo.js";
 import CartsMongoManager from "../dao/CartMongo.manager.js";
-import { UsersMongo } from "../dao/UsersMongo.js";
+import UsersMongo from '../dao/UsersMongo.js';
 import { auth } from "../middlewares/auth.middleware.js";
 import { sessionsRouter } from "./Sessions.router.js";
 
@@ -11,6 +12,9 @@ const cartService = new CartsMongoManager();
 const userService = new UsersMongo();
 
 const router = Router();
+
+// Obtener la ruta del directorio actual
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Redirigir a la página de login
 router.get('/', async (req, res) => {

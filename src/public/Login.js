@@ -1,13 +1,14 @@
 const registerBtn = document.querySelector('#registerBtn');
+const loginForm = document.querySelector('#loginForm');
 
 registerBtn.addEventListener('click', (evt) => {
     evt.preventDefault();
     window.location.href = '/register';
 });
 
-const loginForm = document.querySelector('#loginForm');
+loginForm.addEventListener('submit', handleLogin);
 
-loginForm.addEventListener('submit', async (evt) => {
+async function handleLogin(evt) {
     evt.preventDefault();
 
     const formData = new FormData(loginForm);
@@ -24,24 +25,21 @@ loginForm.addEventListener('submit', async (evt) => {
 
         if (response.ok) {
             window.location.href = '/products';
-
         } else {
             const errorText = await response.json();
-            Swal.fire({
-                title: 'Error!',
-                text: errorText.error,
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
+            showErrorModal(errorText.error);
         }
     } catch (error) {
-        
         console.error('Error:', error);
-        Swal.fire({
-            title: 'Error!',
-            text: 'Ocurrió un error, porfavor intentalo nuevamente.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
+        showErrorModal('Ocurrió un error, por favor inténtalo nuevamente.');
     }
-});
+}
+
+function showErrorModal(message) {
+    Swal.fire({
+        title: 'Error!',
+        text: message,
+        icon: 'error',
+        confirmButtonText: 'OK'
+    });
+}

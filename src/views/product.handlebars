@@ -1,31 +1,32 @@
 <main class="main">
-  <section class="container">
-    <h1>Product ID: {{product._id}}</h1>
-    <h2>Carrito ID: {{cartId}}</h2>
-    <div>
-      <div class="product-card">
-        <div class="product-image">
-          <img src={{product.thumbnails}} alt="" />
+    <section class="container">
+        <h1>Product ID: {{product._id}}</h1>
+        <h2>Carrito ID: {{cartId}}</h2>
+        <div>
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="{{product.thumbnails}}" alt="Product Image" />
+                </div>
+                <div class="product-info">
+                    <h2>Producto: {{product.title}}</h2>
+                    <h2>Precio: {{product.price}}</h2>
+                    <h3>Descripción: {{product.description}}</h3>
+                    <h3>Status: {{product.status}}</h3>
+                    <h4>Stock: {{product.stock}}</h4>
+                    <p>Categoría: {{product.category}}</p>
+                    <p>Código: {{product.code}}</p>
+                    <button
+                        id="addToCartBtn"
+                        class="product-btn"
+                        data-product-id="{{product._id}}"
+                        data-product-title="{{product.title}}"
+                        data-cart-id="{{cartId}}"
+                    >Agregar al carrito</button>
+                </div>
+            </div>
         </div>
-        <div class="product-info">
-          <h2>Producto: {{product.title}}</h2>
-          <h2>Precio: {{product.price}}</h2>
-          <h3>Descripción: {{product.description}}</h3>
-          <h3>Status: {{product.status}}</h3>
-          <h4>Stock: {{product.stock}}</h4>
-          <p>Categoría: {{product.category}}</p>
-          <p>Código: {{product.code}}</p>
-          <button
-            id="addToCartBtn"
-            class="product-btn"
-            data-product-id="{{product._id}}"
-            data-product-title="{{product.title}}"
-            data-cart-id="{{cartId}}"
-          >Agregar al carrito</button>
-        </div>
-      </div>
-    </div>
-  </section>
+    </section>
 </main>
-
-<script async src="../public/Product.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="/css/product.css" />
+<script async src="/js/product.js"></script>

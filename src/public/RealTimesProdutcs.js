@@ -10,90 +10,81 @@ const stock = document.querySelector("#stock");
 const category = document.querySelector("#category");
 const thumbnails = document.querySelector("#thumbnails");
 
-statusCheck = () => {
-	if (productStatus.checked) return true;
-	return false;
+const statusCheck = () => {
+    return productStatus.checked; // Simplificamos la función statusCheck
 };
 
-socket.on("connection", async () => {
-	console.log("Conectado al servidor Socket.IO");
+socket.on("connect", () => { // Cambiamos "connection" a "connect"
+    console.log("Conectado al servidor Socket.IO");
 });
-
 
 socket.on("getProducts", async (products) => {
-	const listProducts = document.querySelector("#listProducts");
-	let product = "";
-	for (prod of await products) {
-		product += `
-    <div class="container">
-      <li>${prod.title}</li>
-      <div>
-        <button class="btnDelete" id="${prod.id}">Borrar</button>
-      </div>
-      <div>
-        <button class="btnUpdate" id="${prod.id}">Actualizar</button>
-      </div>
-    </div>
-    `;
-	}
+    const listProducts = document.querySelector("#listProducts");
+    let productHTML = "";
+    for (const prod of products) { // Cambiamos "product" a "prod" para evitar conflicto con la variable externa
+        productHTML += `
+            <div class="container">
+                <li>${prod.title}</li>
+                <div>
+                    <button class="btnDelete" id="${prod.id}">Borrar</button>
+                </div>
+                <div>
+                    <button class="btnUpdate" id="${prod.id}">Actualizar</button>
+                </div>
+            </div>
+        `;
+    }
 
-	listProducts.innerHTML = product;
+    listProducts.innerHTML = productHTML;
 
-	btnDelete = document.querySelectorAll(".btnDelete");
+    const btnDelete = document.querySelectorAll(".btnDelete");
 
-	btnDelete.forEach((btn) => {
-		btn.addEventListener("click", async (evt) => {
-			evt.preventDefault();
-			socket.emit("deleteProduct", btn.id);
-		});
-	});
+    btnDelete.forEach((btn) => {
+        btn.addEventListener("click", async (evt) => {
+            evt.preventDefault();
+            socket.emit("deleteProduct", btn.id);
+        });
+    });
 
-	const btnUpdate = document.querySelectorAll(".btnUpdate");
-	btnUpdate.forEach((btn) => {
-		btn.addEventListener("click", async (evt) => {
-			evt.preventDefault();
+    const btnUpdate = document.querySelectorAll(".btnUpdate");
+    btnUpdate.forEach((btn) => {
+        btn.addEventListener("click", async (evt) => {
+            evt.preventDefault();
 
-
-			const updatedProductData = {
-				title: title.value,
-				description: description.value,
-				code: code.value,
-				price: Number.parseInt(price.value),
-				status: Boolean(statusCheck),
-				stock: Number.parseInt(stock.value),
-				category: category.value,
-				thumbnails: thumbnails.value,
-			};
-			try {
-
-
-				socket.emit("updateProduct", btn.id, updatedProductData);
-			} catch (error) {
-				console.error("Error", error);
-
-			}
-
-
-		});
-
-	});
+            const updatedProductData = {
+                title: title.value,
+                description: description.value,
+                code: code.value,
+                price: Number.parseInt(price.value),
+                status: statusCheck(), // Llamamos a la función statusCheck
+                stock: Number.parseInt(stock.value),
+                category: category.value,
+                thumbnails: thumbnails.value,
+            };
+            try {
+                socket.emit("updateProduct", btn.id, updatedProductData);
+            } catch (error) {
+                console.error("Error", error);
+            }
+        });
+    });
 });
 
-addProductForm.addEventListener("click", async (evt) => {
-	evt.preventDefault();
-	const newProductData = {
-		title: title.value,
-		description: description.value,
-		code: code.value,
-		price: Number.parseInt(price.value),
-		status: Boolean(statusCheck),
-		stock: Number.parseInt(stock.value),
-		category: category.value,
-		thumbnails: thumbnails.value,
-	};
-	try {
-		socket.emit("addProduct", newProductData);
-	} catch (error) {
-		console.error("Error", error);
-	}
+addProductForm.addEventListener("submit", async (evt) => { // Cambiamos "click" a "submit"
+    evt.preventDefault();
+    const newProductData = {
+        title: title.value,
+        description: description.value,
+        code: code.value,
+        price: Number.parseInt(price.value),
+        status: statusCheck(), // Llamamos a la función statusCheck
+        stock: Number.parseInt(stock.value),
+        category: category.value,
+        thumbnails: thumbnails.value,
+    };
+    try {
+        socket.emit("addProduct", newProductData);
+    } catch (error) {
+        console.error("Error", error);
+    }
 });

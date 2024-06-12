@@ -1,8 +1,8 @@
-import usermodel from './models/usermodel.js';
+import UserModel from './models/usermodel.js';
 
 export class UsersManagerMongo {
   constructor() {
-    this.usermodel = usermodel;
+    this.usermodel = UserModel; // Corregido el nombre de la variable
   }
 
   async getUsers({ limit = 10, numPage = 1 }) {
@@ -30,4 +30,6 @@ export class UsersManagerMongo {
     return await this.usermodel.findOne({ email: email });
   }
 }
- export default UsersMongo
+
+// Corregido el nombre de la exportación
+export default UsersManagerMongo;

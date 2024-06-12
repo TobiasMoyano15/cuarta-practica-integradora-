@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
         if (hasPrevPage) {
             prevLink = `/products?pageNum=${prevPage}`;
             if (limit) prevLink += `&limit=${limit}`;
-            if (title) prevLink += `&title=${title}`;
+            if (title) prevLink += `&product=${title}`;
             if (category) prevLink += `&category=${category}`;
             if (status) prevLink += `&status=${status}`;
             if (sortByPrice) prevLink += `&sortByPrice=${sortByPrice}`;
@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
         if (hasNextPage) {
             nextLink = `/products?pageNum=${nextPage}`;
             if (limit) nextLink += `&limit=${limit}`;
-            if (title) nextLink += `&title=${title}`;
+            if (title) nextLink += `&product=${title}`;
             if (category) nextLink += `&category=${category}`;
             if (status) nextLink += `&status=${status}`;
             if (sortByPrice) nextLink += `&sortByPrice=${sortByPrice}`;

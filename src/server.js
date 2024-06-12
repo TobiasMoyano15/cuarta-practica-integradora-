@@ -18,7 +18,6 @@ import chatRouter from "../src/routes/ChatRouter.js";
 import { sessionsRouter } from "../src/routes/Sessions.router.js";
 import MongoStore from "connect-mongo";
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -29,8 +28,7 @@ const chatMongoManager = new ChatMongoManager;
 const app = express();
 const PORT = process.env.PORT || 8080 || 80 || '179.27.75.242';
 
-const httpServer = app.listen(PORT, (error) => {
-    if (error) return console.log(error);
+const httpServer = app.listen(PORT, () => {
     console.log(`Server escuchando en el puerto ${PORT}`);
 });
 
@@ -136,6 +134,5 @@ io.on("connection", async (socket) => {
         } catch (error) {
             throw error;
         }
-
     });
 });

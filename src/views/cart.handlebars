@@ -3,8 +3,24 @@
     <div>
         <ul>
             {{#each cart.products}}
-                <li>{{product.title}}</li>
+                <li>
+                    <div class="container">
+                        <div class="product-card">
+                            <div>
+                                <img class="product-image" src={{product.thumbnails}} alt="alt" />
+                            </div>
+                            <div class="product-info">
+                                <h3 id="productli" class="product-title">{{product.title}}</h3>
+                                <h4 id="productli">{{quantity}}</h4>
+                                <h3 id="productli" class="product-price">${{product.price}}</h3>
+                            </div>
+                            <!-- Botón para quitar -->
+                            <!-- <button id="removeFromCartBtn">Quitar</button> -->
+                        </div>
+                    </div>
+                </li>
             {{/each}}
         </ul>
     </div>
+    <button id="volverBtn" class="product-btn">Volver</button>
 </main>

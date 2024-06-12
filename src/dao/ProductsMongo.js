@@ -1,11 +1,11 @@
-import productModel from '../models/productModel.js';
+import ProductModel from './models/product.model.js';
 
 class ProductsMongoManager {
     constructor() {
-        this.productModel = productModel;
+        this.productModel = ProductModel;
     }
 
-    getProducts = async ({ limit = 10, pageNum = 1, sortByPrice, category, status, title }) => {
+    async getProducts({ limit = 10, pageNum = 1, sortByPrice, category, status, title }) {
         let query = {};
         if (category) {
             query.category = category;
@@ -25,7 +25,7 @@ class ProductsMongoManager {
         return await this.productModel.paginate(query, { limit: limit, page: pageNum, lean: true, sort: toSortedByPrice });
     }
 
-    addProduct = async (title, description, code, price, status, stock, category, thumbnails = './images/IMG_placeholder.jpg') => {
+    async addProduct(title, description, code, price, status, stock, category, thumbnails = './images/IMG_placeholder.jpg') {
         const newProduct = {
             title: title,
             description: description,
@@ -37,147 +37,23 @@ class ProductsMongoManager {
             thumbnails: thumbnails
         };
         try {
-            return await this.productModel.collection.insertOne(newProduct);
+            return await this.productModel.create(newProduct);
         } catch (error) {
             throw error;
         }
     }
 
-    getProductsById = async (productId) => {
+    async getProductsById(productId) {
         return await this.productModel.findOne({ _id: productId }).lean();
     }
 
-    updateProduct = async (productId, updatedProduct) => {
+    async updateProduct(productId, updatedProduct) {
         return await this.productModel.updateOne({ _id: productId }, { $set: updatedProduct });
     }
 
-    deleteProduct = async (productId) => {
+    async deleteProduct(productId) {
         return await this.productModel.deleteOne({ _id: productId });
     }
 }
 
-// Temporal para insertar más productos
-const productosmuchos = [
-    {
-        "title": "Remera-01",
-        "description": "Remera-01 Descripción",
-        "code": "REM001",
-        "price": 1500,
-        "status": true,
-        "stock": 20,
-        "category": "remeras",
-        "thumbnails": "./images/remera01.jpg"
-    },
-    {
-        "title": "Remera-02",
-        "description": "Remera-02 Descripción",
-        "code": "REM002",
-        "price": 1600,
-        "status": true,
-        "stock": 15,
-        "category": "remeras",
-        "thumbnails": "./images/remera02.jpg"
-    },
-    {
-        "title": "Remera-03",
-        "description": "Remera-03 Descripción",
-        "code": "REM003",
-        "price": 1700,
-        "status": true,
-        "stock": 25,
-        "category": "remeras",
-        "thumbnails": "./images/remera03.jpg"
-    },
-    {
-        "title": "Remera-04",
-        "description": "Remera-04 Descripción",
-        "code": "REM004",
-        "price": 1800,
-        "status": true,
-        "stock": 30,
-        "category": "remeras",
-        "thumbnails": "./images/remera04.jpg"
-    },
-    {
-        "title": "Buzo-01",
-        "description": "Buzo-01 Descripción",
-        "code": "BUZ001",
-        "price": 2500,
-        "status": true,
-        "stock": 10,
-        "category": "buzos",
-        "thumbnails": "./images/buzo01.jpg"
-    },
-    {
-        "title": "Buzo-02",
-        "description": "Buzo-02 Descripción",
-        "code": "BUZ002",
-        "price": 2600,
-        "status": true,
-        "stock": 12,
-        "category": "buzos",
-        "thumbnails": "./images/buzo02.jpg"
-    },
-    {
-        "title": "Buzo-03",
-        "description": "Buzo-03 Descripción",
-        "code": "BUZ003",
-        "price": 2700,
-        "status": true,
-        "stock": 8,
-        "category": "buzos",
-        "thumbnails": "./images/buzo03.jpg"
-    },
-    {
-        "title": "Buzo-04",
-        "description": "Buzo-04 Descripción",
-        "code": "BUZ004",
-        "price": 2800,
-        "status": true,
-        "stock": 20,
-        "category": "buzos",
-        "thumbnails": "./images/buzo04.jpg"
-    },
-    {
-        "title": "Buzo Estampado-01",
-        "description": "Buzo Estampado-01 Descripción",
-        "code": "BES001",
-        "price": 3000,
-        "status": true,
-        "stock": 5,
-        "category": "buzos estampados",
-        "thumbnails": "./images/buzo_estampado01.jpg"
-    },
-    {
-        "title": "Buzo Estampado-02",
-        "description": "Buzo Estampado-02 Descripción",
-        "code": "BES002",
-        "price": 3100,
-        "status": true,
-        "stock": 7,
-        "category": "buzos estampados",
-        "thumbnails": "./images/buzo_estampado02.jpg"
-    },
-    {
-        "title": "Buzo Estampado-03",
-        "description": "Buzo Estampado-03 Descripción",
-        "code": "BES003",
-        "price": 3200,
-        "status": true,
-        "stock": 6,
-        "category": "buzos estampados",
-        "thumbnails": "./images/buzo_estampado03.jpg"
-    },
-    {
-        "title": "Buzo Estampado-04",
-        "description": "Buzo Estampado-04 Descripción",
-        "code": "BES004",
-        "price": 3300,
-        "status": true,
-        "stock": 10,
-        "category": "buzos estampados",
-        "thumbnails": "./images/buzo_estampado04.jpg"
-    }
-];
-
-export default ProductsMongo;
+export default ProductsMongoManager;

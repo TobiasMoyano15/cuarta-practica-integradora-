@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import ChatMongoManager from '../dao/ChatMongo.manager';
+import ChatMongoManager from '../dao/ChatMongo.manager.js'; // Corregido el nombre del archivo
 
 const router = Router();
-const chatService = new ChatMongoManager;
+const chatService = new ChatMongoManager(); // Agregado paréntesis para la instanciación
 
 router.get('/', async (req, res) => {
     try {
@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
         res.status(200).send({ status: 'success', payload: messages });
 
     } catch (error) {
-        throw error;
+        res.status(500).send({ status: 'error', error: error.message }); // Enviado error.message
     }
 });
 
@@ -21,7 +21,7 @@ router.post('/', async (req, res) => {
         res.send({ status: 'success', payload: newMessage });
 
     } catch (error) {
-        throw error;
+        res.status(500).send({ status: 'error', error: error.message }); // Enviado error.message
     }
 });
 
