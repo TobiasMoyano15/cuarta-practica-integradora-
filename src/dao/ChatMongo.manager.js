@@ -9,6 +9,7 @@ class ChatMongoManager {
         try {
             return await this.chatmodel.find();
         } catch (error) {
+            console.error('Error fetching messages:', error);
             throw error;
         }
     }
@@ -22,6 +23,7 @@ class ChatMongoManager {
             console.log(newMessage);
             return await this.chatmodel.create(newMessage);
         } catch (error) {
+            console.error('Error adding message:', error);
             throw error;
         }
     }

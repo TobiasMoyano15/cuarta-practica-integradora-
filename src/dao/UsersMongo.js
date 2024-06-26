@@ -1,11 +1,11 @@
 import UserModel from './models/usermodel.js';
 
-export class UsersManagerMongo {
+class UsersManagerMongo {
   constructor() {
-    this.usermodel = UserModel; // Corregido el nombre de la variable
+    this.usermodel = UserModel;
   }
 
-  async getUsers({ limit = 10, numPage = 1 }) {
+  async getUsers({ limit = 10, numPage = 1 } = {}) {
     const users = await this.usermodel.paginate({}, { limit, page: numPage, sort: { price: -1 }, lean: true });
     return users;
   }
@@ -15,7 +15,7 @@ export class UsersManagerMongo {
   }
 
   async getUserBy(filter) {
-    return this.usermodel.findOne(filter);
+    return await this.usermodel.findOne(filter);
   }
 
   async updateUser(filter, updatedUser) {
@@ -31,5 +31,4 @@ export class UsersManagerMongo {
   }
 }
 
-// Corregido el nombre de la exportación
 export default UsersManagerMongo;

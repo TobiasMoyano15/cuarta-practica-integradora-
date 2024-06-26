@@ -12,12 +12,18 @@ const userSchema = new Schema({
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        index: true
     },
+    age: Number,
     password: String,
+    cart: {
+        type: Schema.Types.ObjectId,
+        ref: 'carts'
+    },
     role: {
         type: String,
-        enum: ['user', 'admin'], // Corregido 'emum' a 'enum'
+        enum: ['user', 'premium-user', 'admin'], // Corregido 'emum' a 'enum'
         default: 'user'
     }
 });

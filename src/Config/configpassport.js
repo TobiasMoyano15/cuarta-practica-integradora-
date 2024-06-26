@@ -4,10 +4,20 @@ import GithubStrategy from 'passport-github2';
 import jwt from 'passport-jwt';
 import { PRIVATE_KEY, generateToken } from '../utils/jsonwebtoken.js';
 import CartsMongoManager from '../daos/cartsManagerMongo.js';
+import dotenv from 'dotenv';
+import { objectConfig } from './db.js';
 
-const LocalStrategy = local.Strategy;
+// Configuración de dotenv
+dotenv.config({
+  path: process.env.NODE_ENV === 'production' ? './.env.production' : './.env.development'
+});
+
+// Definición de las configuraciones en un objeto
+const { github_CallbackURL, github_ClientSecret, github_ClientID } = objectConfig;
 const userService = new UsersManagerMongo();
 const cartsService = new CartsMongoManager();
+const JWTStrategy = jwt.Strategy;
+const ExtractJWT = jwt.ExtractJwt;
 
 export const initializePassport = () => {
     
@@ -51,8 +61,8 @@ export const initializePassport = () => {
         }
     }));
 
-    passport.use('jwt', new jwt.Strategy({
-        jwtFromRequest: jwt.ExtractJwt.fromAuthHeaderAsBearerToken(),
+    passport.use('jwt', new JWTStrategy({
+        jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
         secretOrKey: PRIVATE_KEY
     }, async (jwt_payload, done) => {
         try {
@@ -64,9 +74,9 @@ export const initializePassport = () => {
     }));
 
     passport.use('github', new GithubStrategy({
-        clientID: 'Iv23liQxo01u9lMy7LxQ',
-        clientSecret: 'fe4104715d07c3b0f2c65f81e450feaf9f659d08',
-        callbackURL: 'http://localhost:8080/api/sessions/githubcallback'
+        clientID: github_ClientID,
+        clientSecret: github_ClientSecret,
+        callbackURL: github_CallbackURL
     }, async (accessToken, refreshToken, profile, done) => {
         try {
             let user = await userService.getUserBy({ email: profile._json.login });
@@ -81,7 +91,7 @@ export const initializePassport = () => {
                 };
                 let result = await userService.createUser(newUser);
                 user = result;
-            } 
+            }
             const token = generateToken({ id: user._id, email: user.email, role: user.role, cartID: newCart._id });
             user.token = token;
 

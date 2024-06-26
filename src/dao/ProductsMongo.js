@@ -5,7 +5,7 @@ class ProductsMongoManager {
         this.productModel = ProductModel;
     }
 
-    async getProducts({ limit = 10, pageNum = 1, sortByPrice, category, status, title }) {
+    async getProducts({ limit = 10, pageNum = 1, sortByPrice, category, status, title } = {}) {
         let query = {};
         if (category) {
             query.category = category;
@@ -14,7 +14,7 @@ class ProductsMongoManager {
             query.status = status;
         }
         if (title) {
-            query.title = { $regex: title, $options: 'i' };
+            query.$text = { $search: title, $diacriticSensitive: false };
         }
 
         let toSortedByPrice = {};
@@ -22,19 +22,19 @@ class ProductsMongoManager {
             toSortedByPrice = { price: parseInt(sortByPrice) };
         }
 
-        return await this.productModel.paginate(query, { limit: limit, page: pageNum, lean: true, sort: toSortedByPrice });
+        return await this.productModel.paginate(query, { limit, page: pageNum, lean: true, sort: toSortedByPrice });
     }
 
     async addProduct(title, description, code, price, status, stock, category, thumbnails = './images/IMG_placeholder.jpg') {
         const newProduct = {
-            title: title,
-            description: description,
-            code: code,
-            price: price,
-            status: status,
-            stock: stock,
-            category: category,
-            thumbnails: thumbnails
+            title,
+            description,
+            code,
+            price,
+            status,
+            stock,
+            category,
+            thumbnails
         };
         try {
             return await this.productModel.create(newProduct);
@@ -45,6 +45,10 @@ class ProductsMongoManager {
 
     async getProductsById(productId) {
         return await this.productModel.findOne({ _id: productId }).lean();
+    }
+
+    async getProductsBy(filter) {
+        return await this.productModel.findOne(filter).lean();
     }
 
     async updateProduct(productId, updatedProduct) {

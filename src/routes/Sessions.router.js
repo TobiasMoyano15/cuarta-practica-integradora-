@@ -3,10 +3,15 @@ import { UsersManagerMongo } from '../dao/UsersMongo.js';
 import { createHash, isValidPassword } from '../util/bcrypt.js'; 
 import passport from 'passport';
 import { auth } from '../middlewares/auth.middleware.js';
+import { passportCall } from '../util/passportCall.js';
+import CartsMongoManager from '../dao/CartMongo.manager.js';
+import { authorizationJwt } from '../util/authorizationJwt.js';
+import { authTokenMiddleware, generateToken } from '../util/jsonwebtoken.js';
 
 export const sessionsRouter = Router();
 
 const userService = new UsersManagerMongo();
+const cartsService = new CartsMongoManager(); // Assuming correct import and usage of CartsMongoManager
 
 // GitHub authentication
 sessionsRouter.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
@@ -26,11 +31,13 @@ sessionsRouter.post('/register', async (req, res) => {
         const userExist = await userService.getUserBy({ email });
         if (userExist) return res.status(401).send({ status: 'error', error: `El usuario con el email ${userExist.email} ya existe` });
 
+        const newCart = await cartsService.addNewCart(); // Assuming addNewCart() is a method in CartsMongoManager
         const newUser = {
             first_name,
             last_name,
             email,
-            password: createHash(password) // Encripta la contraseña
+            password: createHash(password), // Encripta la contraseña
+            cart: newCart._id // Assuming newCart has an _id property
         };
 
         await userService.createUser(newUser);
@@ -39,15 +46,6 @@ sessionsRouter.post('/register', async (req, res) => {
         console.log('error:', error);
         return res.status(500).send({ status: 'error', error: 'Ocurrió un error, por favor intentalo nuevamente' });
     }
-});
-
-// Registro con Passport.js
-sessionsRouter.post('/register', passport.authenticate('register', { failureRedirect: '/failregister' }), async (req, res) => {
-    res.send({ status: 'success', message: 'Usuario registrado correctamente' });
-});
-
-sessionsRouter.post('/failregister', async (req, res) => {
-    res.send({ error: 'Falló el registro' });
 });
 
 // Login de usuarios
@@ -81,22 +79,6 @@ sessionsRouter.post('/login', async (req, res) => {
     res.redirect('/products');
 });
 
-// Login con Passport.js
-sessionsRouter.post('/login', passport.authenticate('login', { failureRedirect: '/faillogin' }), async (req, res) => {
-    if (!req.user) return res.status(400).send({ status: 'error', error: 'Credenciales invalidas' });
-    req.session.user = {
-        first_name: req.user.first_name,
-        last_name: req.user.last_name,
-        role: req.user.role,
-        email: req.user.email
-    };
-    res.send({ status: 'success', payload: req.user });
-});
-
-sessionsRouter.post('/faillogin', (req, res) => {
-    res.send({ error: 'Falló el login' });
-});
-
 // Logout de usuarios
 sessionsRouter.post('/logout', (req, res) => {
     req.session.destroy(err => {
@@ -107,5 +89,5 @@ sessionsRouter.post('/logout', (req, res) => {
 
 // Ruta protegida
 sessionsRouter.get('/current', auth, (req, res) => {
-    res.send('datos sensibles');
+    res.send(`Datos sensibles para el Rol: ${req.user.role}`);
 });

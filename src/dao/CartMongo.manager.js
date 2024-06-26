@@ -34,7 +34,10 @@ class CartsMongoManager {
         }
     };
 
-    getCartBy = async (filter) => await this.cartmodel.findOne(filter).lean();
+    getCartBy = async (filter) => {
+        const cart = await this.cartmodel.findOne(filter).lean();
+        return cart;
+    };
 
     updateProductFromCart = async (cartId, product, quantity) => {
         const cartExists = this.cartmodel.where({ _id: cartId, 'products.product': product });
@@ -68,17 +71,23 @@ class CartsMongoManager {
         return newProductInCart;
     };
 
-    deleteProductFromCart = async (cid, pid) => await this.cartmodel.findOneAndUpdate(
-        { _id: cid },
-        { $pull: { products: { product: pid } } },
-        { new: true }
-    );
+    deleteProductFromCart = async (cid, pid) => {
+        const result = await this.cartmodel.findOneAndUpdate(
+            { _id: cid },
+            { $pull: { products: { product: pid } } },
+            { new: true }
+        );
+        return result;
+    };
 
-    deleteCart = async (cid) => await this.cartmodel.findOneAndUpdate(
-        { _id: cid },
-        { $set: { products: [] } },
-        { new: true }
-    );
+    deleteCart = async (cid) => {
+        const result = await this.cartmodel.findOneAndUpdate(
+            { _id: cid },
+            { $set: { products: [] } },
+            { new: true }
+        );
+        return result;
+    };
 }
 
 export default CartsMongoManager;

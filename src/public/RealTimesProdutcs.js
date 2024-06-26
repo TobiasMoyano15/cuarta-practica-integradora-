@@ -11,36 +11,35 @@ const category = document.querySelector("#category");
 const thumbnails = document.querySelector("#thumbnails");
 
 const statusCheck = () => {
-    return productStatus.checked; // Simplificamos la función statusCheck
+    return productStatus.checked;
 };
 
-socket.on("connect", () => { // Cambiamos "connection" a "connect"
+socket.on("connect", () => {
     console.log("Conectado al servidor Socket.IO");
 });
 
-socket.on("getProducts", async (products) => {
+socket.on("getProducts", (products) => {
     const listProducts = document.querySelector("#listProducts");
     let productHTML = "";
-    for (const prod of products) { // Cambiamos "product" a "prod" para evitar conflicto con la variable externa
+    products.forEach(prod => {
         productHTML += `
             <div class="container">
                 <li>${prod.title}</li>
                 <div>
-                    <button class="btnDelete" id="${prod.id}">Borrar</button>
+                    <button class="btnDelete" id="${prod._id}">Borrar</button>
                 </div>
                 <div>
-                    <button class="btnUpdate" id="${prod.id}">Actualizar</button>
+                    <button class="btnUpdate" id="${prod._id}">Actualizar</button>
                 </div>
             </div>
         `;
-    }
+    });
 
     listProducts.innerHTML = productHTML;
 
     const btnDelete = document.querySelectorAll(".btnDelete");
-
     btnDelete.forEach((btn) => {
-        btn.addEventListener("click", async (evt) => {
+        btn.addEventListener("click", (evt) => {
             evt.preventDefault();
             socket.emit("deleteProduct", btn.id);
         });
@@ -48,7 +47,7 @@ socket.on("getProducts", async (products) => {
 
     const btnUpdate = document.querySelectorAll(".btnUpdate");
     btnUpdate.forEach((btn) => {
-        btn.addEventListener("click", async (evt) => {
+        btn.addEventListener("click", (evt) => {
             evt.preventDefault();
 
             const updatedProductData = {
@@ -56,7 +55,7 @@ socket.on("getProducts", async (products) => {
                 description: description.value,
                 code: code.value,
                 price: Number.parseInt(price.value),
-                status: statusCheck(), // Llamamos a la función statusCheck
+                status: statusCheck(),
                 stock: Number.parseInt(stock.value),
                 category: category.value,
                 thumbnails: thumbnails.value,
@@ -70,14 +69,14 @@ socket.on("getProducts", async (products) => {
     });
 });
 
-addProductForm.addEventListener("submit", async (evt) => { // Cambiamos "click" a "submit"
+addProductForm.addEventListener("submit", (evt) => {
     evt.preventDefault();
     const newProductData = {
         title: title.value,
         description: description.value,
         code: code.value,
         price: Number.parseInt(price.value),
-        status: statusCheck(), // Llamamos a la función statusCheck
+        status: statusCheck(),
         stock: Number.parseInt(stock.value),
         category: category.value,
         thumbnails: thumbnails.value,

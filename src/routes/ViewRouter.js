@@ -92,7 +92,7 @@ router.get('/products', async (req, res) => {
 // Mostrar un producto específico
 router.get('/product/:pid', async (req, res) => {
     const { pid } = req.params;
-    const product = await productService.getProductsById(pid);
+    const product = await productService.getProductById(pid); // Cambiado a getProductById para reflejar el método adecuado
     const cartId = '6641b6b5b2cc19ccdc4776eb';  // ID del carrito hardcodeado para pruebas
     res.render('./product.hbs', { product, cartId });
 });
@@ -100,7 +100,7 @@ router.get('/product/:pid', async (req, res) => {
 // Mostrar un carrito específico
 router.get('/cart/:cid', async (req, res) => {
     const { cid } = req.params;
-    const cart = await cartService.getCartById(cid);
+    const cart = await cartService.getCartById(cid); // Cambiado a getCartById para reflejar el método adecuado
     res.render('./cart.hbs', { cart });
 });
 

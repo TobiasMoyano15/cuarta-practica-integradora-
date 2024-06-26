@@ -27,14 +27,19 @@ class CartManager {
     }
 
     addNewCart = async () => {
-        const cart = {
-            id: await this.getNextId(),
-            products: []
-        };
-        const cartsData = await this.readCartsJson();
-        cartsData.push(cart);
-        await this.writeCart(cartsData);
-        return cartsData;
+        try {
+            const cart = {
+                id: await this.getNextId(),
+                products: []
+            };
+            const cartsData = await this.readCartsJson();
+            cartsData.push(cart);
+            await this.writeCart(cartsData);
+            return cart;
+        } catch (error) {
+            console.error('Error al agregar nuevo carrito:', error);
+            throw error;
+        }
     }
 
     addProductToCart = async (cartId, product, quantity) => {

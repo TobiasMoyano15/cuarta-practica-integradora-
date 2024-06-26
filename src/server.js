@@ -1,47 +1,46 @@
 import express from "express";
 import handlebars from "express-handlebars";
-import { Server } from "socket.io";
-import connectMongoDB from '../config/db.js';
+import { Server as ServerIO } from "socket.io";
+import { Server as serverHttp } from "http";
+import passport from "passport";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import { dirname } from "path";
-import { fileURLToPath } from 'url';
-import { productsSocket } from '../src/util/productsSocket.js';
-import ProductManager from "../src/dao/ProductsFS.manager.js";
-import ChatMongoManager from "../src/dao/ChatMongo.manager.js";
-import viewsRouter from "../src/routes/ViewRouter.js";
-import pruebasRouter from "../src/routes/Pruebas.router.js";
-import realtimeproductsRouter from "../src/routes/Realtimeproducts.router.js";
-import productsRouter from "../src/routes/ProductRouter.js";
-import cartsRouter from "../src/routes/CartRouter.js";
-import chatRouter from "../src/routes/ChatRouter.js";
-import { sessionsRouter } from "../src/routes/Sessions.router.js";
+import { connectMongoDb, objectConfig } from "../config/config.js";
+import { productsSocket } from "../utils/productsSocket.js";
+import { chatSocketIO } from "../utils/chatSocketIO.js";
+import { realTimeProducts } from "../utils/realTimeProductsSocketIO.js";
+import { initializePassport } from "../config/passport.config.js";
 import MongoStore from "connect-mongo";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const productsJsonPath = `${__dirname}/FS-Database/Products.json`;
-const productManager = new ProductManager(productsJsonPath);
-const chatMongoManager = new ChatMongoManager;
+import ProductsMongoManager from "../dao/ProductsMongo.js";
+import ChatMongoManager from "../dao/ChatMongo.manager.js";
+import UsersMongo from '../dao/UsersMongo.js';
+import { sessionsRouter } from "../routes/Sessions.router.js";
+import viewsRouter from "../routes/ViewRouter.js";
+import productsRouter from "../routes/ProductRouter.js";
+import cartsRouter from "../routes/CartRouter.js";
+import realtimeproductsRouter from "../routes/Realtimeproducts.router.js";
+import chatRouter from "../routes/ChatRouter.js";
+import pruebasRouter from "../routes/Pruebas.router.js";
 
 const app = express();
-const PORT = process.env.PORT || 8080 || 80 || '179.27.75.242';
+const httpServer = new serverHttp(app);
+const io = new ServerIO(httpServer);
+const { port } = objectConfig;
 
-const httpServer = app.listen(PORT, () => {
-    console.log(`Server escuchando en el puerto ${PORT}`);
-});
+const userService = new UsersMongo();
+const productManager = new ProductsMongoManager();
+const chatMongoManager = new ChatMongoManager();
 
-const io = new Server(httpServer);
-
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(`${__dirname}/public`));
-app.use(cookieParser('F1rmas3cr3t@'));
+app.use(express.static("public"));
+app.use(cookieParser());
 
 app.use(session({
     store: MongoStore.create({
-        mongoUrl: 'mongodb+srv://zieglering:bX5FNTpfWgkHOvE0@cluster0.vxpuioi.mongodb.net/ecommerce',
+        mongoUrl: "mongodb+srv://zieglering:bX5FNTpfWgkHOvE0@cluster0.vxpuio.mongodb.net/ecommerce",
         mongoOptions: {},
         ttl: 60 * 60 * 1000 * 24
     }),
@@ -50,15 +49,18 @@ app.use(session({
     saveUninitialized: true
 }));
 
-connectMongoDB();
+connectMongoDb();
+initializePassport();
+app.use(passport.initialize());
 
+// View engine setup
 app.engine(".hbs", handlebars({
     extname: '.hbs'
 }));
+app.set("views", "./views");
+app.set("view engine", ".hbs");
 
-app.set("views", `${__dirname}/views`);
-app.set("view engine", ".handlebars");
-
+// Routes
 app.use("/", viewsRouter);
 app.use("/api/sessions", sessionsRouter);
 app.use("/api/products", productsRouter);
@@ -67,72 +69,64 @@ app.use("/realtimeproducts", realtimeproductsRouter);
 app.use("/chat", chatRouter);
 app.use("/pruebas", pruebasRouter);
 
-app.use(productsSocket(io));
-
-app.use((error, req, res, next) => {
-    console.log(error);
-    res.status(500).send('Error 500 en el server');
-});
-
+// Socket.io setup
 io.on("connection", async (socket) => {
     console.log('Cliente conectado');
 
-    socket.emit("getProducts", await productManager.getProducts());
+    // Products Socket
+    socket.on("getProducts", async () => {
+        const products = await productManager.getProducts();
+        socket.emit("getProducts", products);
+    });
 
     socket.on("addProduct", async (newProductData) => {
         try {
-            const responseData = await productManager.addProduct(
-                newProductData.title,
-                newProductData.description,
-                newProductData.code,
-                newProductData.price,
-                newProductData.status,
-                newProductData.stock,
-                newProductData.category,
-                newProductData.thumbnails
-            );
-            io.emit("getProducts", await productManager.getProducts());
+            await productManager.addProduct(newProductData);
+            const products = await productManager.getProducts();
+            io.emit("getProducts", products);
         } catch (error) {
-            console.error("Error", error);
+            console.error("Error adding product:", error);
         }
     });
 
-    socket.on("updateProduct", async (productID, updatedProduct) => {
+    socket.on("updateProduct", async (productId, updatedProduct) => {
         try {
-            await productManager.updateProduct(parseInt(productID), updatedProduct);
-            io.emit("getProducts", await productManager.getProducts());
+            await productManager.updateProduct(productId, updatedProduct);
+            const products = await productManager.getProducts();
+            io.emit("getProducts", products);
         } catch (error) {
-            console.error("Error", error);
+            console.error("Error updating product:", error);
         }
     });
 
-    socket.on("deleteProduct", async (productID) => {
+    socket.on("deleteProduct", async (productId) => {
         try {
-            await productManager.deleteProduct(parseInt(await productID));
-            io.emit("getProducts", await productManager.getProducts());
+            await productManager.deleteProduct(productId);
+            const products = await productManager.getProducts();
+            io.emit("getProducts", products);
         } catch (error) {
-            console.error("Error", error);
+            console.error("Error deleting product:", error);
         }
     });
 
-    // Chat socket
-    let messages = [];
-    try {
-        messages = await chatMongoManager.getMessages();
-        socket.emit('messageLog', messages);
-    } catch (error) {
-        throw error;
-    }
+    // Chat Socket
+    socket.on("getMessages", async () => {
+        const messages = await chatMongoManager.getMessages();
+        socket.emit("messageLog", messages);
+    });
 
-    socket.on('message', async data => {
-        console.log('message data: ', data);
-
+    socket.on("sendMessage", async (data) => {
         try {
             await chatMongoManager.addMessage(data.user, data.message);
-            messages = await chatMongoManager.getMessages();
-            io.emit('messageLog', messages);
+            const messages = await chatMongoManager.getMessages();
+            io.emit("messageLog", messages);
         } catch (error) {
-            throw error;
+            console.error("Error sending message:", error);
         }
     });
+});
+
+// Server listen
+httpServer.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
 });
