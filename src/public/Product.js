@@ -7,7 +7,7 @@ addToCartBtn.addEventListener('click', async () => {
     let quantity = 1;
 
     try {
-        const response = await fetch(`/api/carts/${productId}/products`, { // Corregimos la URL
+        const response = await fetch(`/api/carts/${productId}/products`, { // Corregimos la URL para reflejar el endpoint correcto
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

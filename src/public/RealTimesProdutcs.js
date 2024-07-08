@@ -1,17 +1,18 @@
 const socket = io();
 
-const addProductForm = document.querySelector("#addProductForm");
-const title = document.querySelector("#title");
-const description = document.querySelector("#description");
-const code = document.querySelector("#code");
-const price = document.querySelector("#price");
-const productStatus = document.querySelector("#status");
-const stock = document.querySelector("#stock");
-const category = document.querySelector("#category");
-const thumbnails = document.querySelector("#thumbnails");
+const addProductForm = document.querySelector("#addProductForm"); // Cambio de nombre para reflejar el formulario de agregar producto
+
+const titleInput = document.querySelector("#title");
+const descriptionInput = document.querySelector("#description");
+const codeInput = document.querySelector("#code");
+const priceInput = document.querySelector("#price");
+const productStatusInput = document.querySelector("#status");
+const stockInput = document.querySelector("#stock");
+const categoryInput = document.querySelector("#category");
+const thumbnailsInput = document.querySelector("#thumbnails");
 
 const statusCheck = () => {
-    return productStatus.checked;
+    return productStatusInput.checked;
 };
 
 socket.on("connect", () => {
@@ -51,14 +52,14 @@ socket.on("getProducts", (products) => {
             evt.preventDefault();
 
             const updatedProductData = {
-                title: title.value,
-                description: description.value,
-                code: code.value,
-                price: Number.parseInt(price.value),
+                title: titleInput.value,
+                description: descriptionInput.value,
+                code: codeInput.value,
+                price: Number.parseInt(priceInput.value),
                 status: statusCheck(),
-                stock: Number.parseInt(stock.value),
-                category: category.value,
-                thumbnails: thumbnails.value,
+                stock: Number.parseInt(stockInput.value),
+                category: categoryInput.value,
+                thumbnails: thumbnailsInput.value,
             };
             try {
                 socket.emit("updateProduct", btn.id, updatedProductData);
@@ -72,14 +73,14 @@ socket.on("getProducts", (products) => {
 addProductForm.addEventListener("submit", (evt) => {
     evt.preventDefault();
     const newProductData = {
-        title: title.value,
-        description: description.value,
-        code: code.value,
-        price: Number.parseInt(price.value),
+        title: titleInput.value,
+        description: descriptionInput.value,
+        code: codeInput.value,
+        price: Number.parseInt(priceInput.value),
         status: statusCheck(),
-        stock: Number.parseInt(stock.value),
-        category: category.value,
-        thumbnails: thumbnails.value,
+        stock: Number.parseInt(stockInput.value),
+        category: categoryInput.value,
+        thumbnails: thumbnailsInput.value,
     };
     try {
         socket.emit("addProduct", newProductData);

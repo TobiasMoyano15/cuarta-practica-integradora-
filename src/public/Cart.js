@@ -1,26 +1,38 @@
-const volverBtn = document.querySelector('#volverBtn')
+const volverBtn = document.querySelector('#volverBtn');
+const ticketBtn = document.querySelector('#ticketBtn');
+const cartIDElement = document.querySelector('#cartID');
 
-volverBtn.addEventListener('click', async () => {
+const cartID = cartIDElement.textContent.split(':')[1]?.trim();
+
+volverBtn.addEventListener('click', () => {
     window.location.href = '/products';
-    })
-    // POR HACER - BOTON QUITAR PRODUCTOS DEL CARRITO
-    // const removeFromCartBtn = document.querySelector('#removeFromCartBtn')
-    // const productli = document.querySelector('#productli')
-// removeFromCartBtn.addEventListener('click', async (evt) => {
-//     evt.preventDefault()
-//     // const cartId = addToCartBtn.dataset.cartId;
-//     const productId = productli.dataset.productId;
-//     const productTitle = addToCartBtn.dataset.productTitle;
-//     try{
-//     const response = await fetch(`/api/carts/${cartID}/products/${productId}`, {
-//         method: 'DELETE',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//     });
-//     alert(`Agregado ${productTitle}`);
-//     return response
-// } catch (error) {
-//     console.error('Error al agregar el producto al carrito:', error);
-// }
-// });
+});
+
+ticketBtn.addEventListener('click', async () => {
+    if (!cartID) {
+        alert('Error: no se encuentra cart ID');
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/carts/${cartID}/purchase`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const responseData = await response.json();
+        console.log('Response from purchase API:', responseData);
+
+        if (response.ok) {
+            alert('Compra finalizada con éxito');
+            window.location.href = '/products';
+        } else {
+            alert(`Error al finalizar la compra: ${responseData.error.message || responseData.error}`);
+        }
+    } catch (error) {
+        console.error('Error finalizando la compra:', error);
+        alert('Error al finalizar la compra');
+    }
+});

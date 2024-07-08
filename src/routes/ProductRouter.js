@@ -1,19 +1,21 @@
 import { Router } from 'express';
 import ProductController from '../Controllers/products.controller.js';
+import { passportCall } from '../util/passportCall.js';
+import { authorizationJwt } from '../util/authorizationJwt.js';
 
 const router = Router();
 const {
-    getProducts,
-    getProduct,
     createProduct,
+    getProducts,
+    getProductBy,
     updateProduct,
-    deleteProduct
-} = new ProductController()
+    removeProduct
+} = new ProductController();
 
+router.post('/', passportCall('jwt'), authorizationJwt('admin'),createProduct);
 router.get('/', getProducts);
-router.get('/:pid', getProduct);
-router.post('/', createProduct);
-router.put('/:pid', updateProduct);
-router.delete('/:pid', deleteProduct);
+router.get('/:pid', getProductBy);
+router.put('/:pid', passportCall('jwt'), authorizationJwt('admin'),updateProduct);
+router.delete('/:pid', passportCall('jwt'), authorizationJwt('admin'),removeProduct);
 
 export default router;

@@ -10,17 +10,21 @@
                                 <img class="product-image" src={{product.thumbnails}} alt="alt" />
                             </div>
                             <div class="product-info">
-                                <h3 id="productli" class="product-title">{{product.title}}</h3>
-                                <h4 id="productli">{{quantity}}</h4>
-                                <h3 id="productli" class="product-price">${{product.price}}</h3>
+                                <h3 class="product-title">{{product.title}}</h3>
+                                <h4>{{quantity}}</h4>
+                                <h3 class="product-price">${{product.price}}</h3>
                             </div>
-                            <!-- Botón para quitar -->
-                            <!-- <button id="removeFromCartBtn">Quitar</button> -->
                         </div>
                     </div>
                 </li>
             {{/each}}
         </ul>
     </div>
+    <div class="total-amount">
+        <h3>Total: ${{cart.totalAmount}}</h3>
+    </div>
     <button id="volverBtn" class="product-btn">Volver</button>
 </main>
+
+<link rel="stylesheet" href="/css/cart.css" />
+<script async src="/js/cart.js"></script>

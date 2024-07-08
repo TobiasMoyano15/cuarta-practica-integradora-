@@ -3,11 +3,17 @@ import ChatController from '../Controllerschats.controller.js';
 
 const router = Router();
 const {
-    getMessage,
-    createMessage
+    createMessage,
+    getMessages,
+    getMessageBy,
+    updateMessage,
+    removeMessage
 } = new ChatController;
 
-router.get('/', getMessage);
 router.post('/', createMessage);
+router.get('/', getMessages);
+router.get('/:id', getMessageBy);
+router.get('/:id', updateMessage);
+router.get('/:id', removeMessage);
 
 export default router;
