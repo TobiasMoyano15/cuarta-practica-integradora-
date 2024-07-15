@@ -1,9 +1,36 @@
-import { productService } from '../service/service.js';
+import { CustomError } from '../service/errors/CustomError.js';
+import { EError } from '../Service/errors/enums.js';
+import { generateInvalidProductError } from '../Service/errors/info.js';
+import { productService } from '../Service/service.js';
 
 class ProductController {
     constructor() {
         this.productService = productService;
     }
+
+    createProduct = async (req, res, next) => {
+        const { title, description, code, price, status = true, stock, category, thumbnails } = req.body;
+        try {
+            if (!title || !description || !code || !price || !stock || !category) {
+                CustomError.createError({
+                    name: 'Error al crear el producto',
+                    cause: generateInvalidProductError({ title, description, code, price, stock, category }),
+                    message: 'Error al crear el producto, campos faltantes o inválidos',
+                    code: EError.MISSING_OR_INVALID_REQUIRED_DATA_ERROR
+                });
+            }
+
+            const { docs: products } = await productService.getProducts();
+            if (products.find((prod) => prod.code === code))
+                return res.status(400).send({ status: 'error', error: `No se pudo agregar el producto con el código ${code} porque ya existe un producto con ese código` });
+
+            const newProduct = await productService.createProduct(title, description, code, price, status, stock, category, thumbnails);
+            res.status(201).send({ status: 'success', payload: newProduct });
+
+        } catch (error) {
+            next(error);
+        }
+    };
 
     getProducts = async (req, res) => {
         try {
@@ -50,31 +77,15 @@ class ProductController {
         }
     };
 
-    getProductById = async (req, res) => {
+    getProductBy = async (req, res) => {
         const { pid } = req.params;
+        const productFound = await productService.getProduct({ _id: pid });
         try {
-            const productFound = await productService.getProduct({ _id: pid });
             if (!productFound)
                 return res.status(400).send({ status: 'error', error: `¡ERROR! No existe ningún producto con el id ${pid}` });
 
             res.status(200).send({ status: 'success', payload: productFound });
-        } catch (error) {
-            res.status(500).send({ status: 'error', error: error });
-        }
-    };
 
-    createProduct = async (req, res) => {
-        const { title, description, code, price, status = true, stock, category, thumbnails } = req.body;
-        try {
-            if (!title || !description || !code || !price || !stock || !category)
-                return res.status(400).send({ status: 'error', error: 'Faltan campos' });
-
-            const products = await productService.getProducts();
-            if (products.find((prod) => prod.code === code))
-                return res.status(400).send({ status: 'error', error: `No se pudo agregar el producto con el código ${code} porque ya existe un producto con ese código` });
-
-            const newProduct = await productService.addProduct({ title, description, code, price, status, stock, category, thumbnails });
-            res.status(201).send({ status: 'success', payload: newProduct });
         } catch (error) {
             res.status(500).send({ status: 'error', error: error });
         }
@@ -82,31 +93,34 @@ class ProductController {
 
     updateProduct = async (req, res) => {
         const { pid } = req.params;
-        const { title, description, code, price, status = true, stock, category, thumbnails } = req.body;
+        const { title, description, code, price, status, stock, category, thumbnails } = req.body;
+        console.log(req.body);
+        console.log(pid);
+        const productFound = await productService.getProduct({ _id: pid });
         try {
-            if (!title || !description || !code || !price || !stock || !category)
-                return res.status(400).send({ status: 'error', error: 'Faltan campos' });
+            if (!title || !description || !code || !price || !stock || !category) {
+                return res.status(400).send({ status: 'error', error: 'faltan campos' });
+            }
 
-            const productFound = await productService.getProduct({ _id: pid });
-            if (!productFound)
-                return res.status(400).send({ status: 'error', error: `No existe el producto con el id ${pid}` });
+            if (!productFound) return res.status(400).send({ status: 'error', error: `No existe el producto con el id ${pid}` });
 
             const updatedProduct = await productService.updateProduct(pid, { title, description, code, price, status, stock, category, thumbnails });
             res.status(201).send({ status: 'success', payload: updatedProduct });
+
         } catch (error) {
             res.status(500).send({ status: 'error', error: error });
         }
     };
 
-    deleteProduct = async (req, res) => {
+    removeProduct = async (req, res) => {
         const { pid } = req.params;
+        const productFound = await productService.getProduct({ _id: pid });
         try {
-            const productFound = await productService.getProduct({ _id: pid });
-            if (!productFound)
-                return res.status(400).send({ status: 'error', error: `¡ERROR! No existe ningún producto con el id ${pid}` });
+            if (!productFound) return res.status(400).send({ status: 'error', error: `¡ERROR! No existe ningún producto con el id ${pid}` });
 
-            await productService.deleteProduct(pid);
-            res.status(200).send({ status: 'success', payload: `El producto con el id ${pid} ha sido eliminado` });
+            res.status(200).send({ status: 'success', payload: productFound });
+            productService.removeProduct(pid);
+
         } catch (error) {
             res.status(500).send({ status: 'error', error: error });
         }

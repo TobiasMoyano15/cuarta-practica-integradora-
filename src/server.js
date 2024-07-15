@@ -12,6 +12,7 @@ import dotenv from 'dotenv';
 import __dirname from "./util/filenameUtils.js";
 import { chatSocketIO } from "./util/chatSocketIO.js";
 import { realTimeProducts } from "./util/realTimeProductsSocketIO.js";
+import { handleErrors } from "./middlewares/errors/errors.middleware.js";
 
 dotenv.config();
 

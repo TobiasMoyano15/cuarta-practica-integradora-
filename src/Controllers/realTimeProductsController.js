@@ -1,4 +1,4 @@
-import { realTimeProductsService } from "../service/service.js";
+import { realTimeProductsService } from "../Service/service.js";
 
 class RealTimeProductController {
     constructor() {

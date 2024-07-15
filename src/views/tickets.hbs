@@ -1,0 +1,8 @@
+<div>
+  <h1>Tickets del usuario {{email}}</h1>
+  {{#each ticket}}
+    <p>Fecha de la compra: {{this.purchase_datetime}}</p>
+    <p>Total de compra: {{this.amount}}</p>
+    <p>Codigo: {{this.code}}</p>
+    <hr />
+  {{/each}}

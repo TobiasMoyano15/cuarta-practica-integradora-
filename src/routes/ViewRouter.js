@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { passportCall } from "../util/passportCall.js";
 import { authorizationJwt } from "../util/authorizationJwt.js";
-import { productService, cartService, userService ,ticketService } from "../service/service.js";
+import { productService, cartService, userService, ticketService } from "../Service/service.js";
 
 const router = Router();
 
@@ -31,7 +31,7 @@ router.get('/users', passportCall('jwt'), authorizationJwt('admin', 'user'), asy
     });
 });
 
-router.get('/products', passportCall('jwt'), authorizationJwt('admin', 'user'),  async (req, res) => {
+router.get('/products', passportCall('jwt'), authorizationJwt('admin', 'user'), async (req, res) => {
     const { limit = 10, pageNum = 1, category, status, product: title, sortByPrice } = req.query;
     const { docs, page, hasPrevPage, hasNextPage, prevPage, nextPage, totalPages } = await productService.getProducts({ limit, pageNum, category, status, title, sortByPrice });
     let prevLink = null;
@@ -74,19 +74,19 @@ router.get('/products', passportCall('jwt'), authorizationJwt('admin', 'user'), 
 
 router.get('/product/:pid', passportCall('jwt'), authorizationJwt('admin', 'user'), async (req, res) => {
     const { pid } = req.params;
-    const product = await productService.getProduct({_id: pid});
+    const product = await productService.getProduct({ _id: pid });
     res.render('./product.hbs', { product, cart: req.user.cart });
 });
 
 router.get('/cart/:cid', passportCall('jwt'), authorizationJwt('admin', 'user'), async (req, res) => {
     const { cid } = req.params;
-    const cart = await cartService.getCart({_id: cid});
+    const cart = await cartService.getCart({ _id: cid });
     res.render('./cart.hbs', { cart });
 });
 
 router.get('/ticket/:tid', passportCall('jwt'), authorizationJwt('admin', 'user'), async (req, res) => {
     const { tid } = req.params;
-    const ticket = await ticketService.getBy({_id: tid});
+    const ticket = await ticketService.getBy({ _id: tid });
     res.render('./ticket.hbs', { ticket });
 });
 

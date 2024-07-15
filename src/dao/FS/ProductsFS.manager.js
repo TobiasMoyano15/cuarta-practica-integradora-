@@ -1,6 +1,6 @@
 // CRUD en Archivos (Files System)
 import fs from 'node:fs';
-import { __dirname } from '../filenameUtils.js';
+import __dirname from '../util/filenameUtils.js';
 
 const path = `${__dirname}/FS-Database/Products.json`;
 

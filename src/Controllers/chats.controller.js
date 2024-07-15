@@ -1,4 +1,4 @@
-import { chatService } from "../service/service.js";
+import { chatService } from "../Service/service.js";
 
 class ChatController {
     constructor() {
