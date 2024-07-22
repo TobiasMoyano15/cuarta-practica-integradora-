@@ -1,3 +1,4 @@
+import { logger } from "../util/logger.js";
 import ticketModel from "./models/ticket.model.js";
 
 class TicketsDaoMongo {
@@ -6,27 +7,43 @@ class TicketsDaoMongo {
   }
 
   create = async (ticketData) => {
-    // console.log('Creating ticket:', newTicket);
-    // return await this.ticketModel.collection.insertOne(newTicket);
     try {
-      // console.log('Creating ticket:', ticketData);
       const result = await ticketModel.create(ticketData);
       return result;
-  } catch (error) {
-      console.error('Error creating ticket:', error);
+    } catch (error) {
+      logger.error('Error creating ticket:', error);
       throw error;
-  }
+    }
   };
 
   getBy = async (filter) => {
-    return ticketModel.findOne(filter).lean();
+    try {
+      const result = await ticketModel.findOne(filter).lean();
+      return result;
+    } catch (error) {
+      logger.error('Error getting ticket by filter:', error);
+      throw error;
+    }
   };
+
   getAll = async (filter) => {
-    return ticketModel.find(filter).lean();
+    try {
+      const result = await ticketModel.find(filter).lean();
+      return result;
+    } catch (error) {
+      logger.error('Error getting all tickets:', error);
+      throw error;
+    }
   };
 
   remove = async (filter) => {
-    return await ticketModel.deleteOne(filter);
+    try {
+      const result = await ticketModel.deleteOne(filter);
+      return result;
+    } catch (error) {
+      logger.error('Error removing ticket:', error);
+      throw error;
+    }
   };
 }
 

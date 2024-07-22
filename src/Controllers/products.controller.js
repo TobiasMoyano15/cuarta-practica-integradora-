@@ -1,4 +1,4 @@
-import { CustomError } from '../service/errors/CustomError.js';
+import { CustomError } from '../Service/errors/CustomError.js';
 import { EError } from '../Service/errors/enums.js';
 import { generateInvalidProductError } from '../Service/errors/info.js';
 import { productService } from '../Service/service.js';
@@ -94,8 +94,7 @@ class ProductController {
     updateProduct = async (req, res) => {
         const { pid } = req.params;
         const { title, description, code, price, status, stock, category, thumbnails } = req.body;
-        console.log(req.body);
-        console.log(pid);
+        
         const productFound = await productService.getProduct({ _id: pid });
         try {
             if (!title || !description || !code || !price || !stock || !category) {

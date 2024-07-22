@@ -1,9 +1,9 @@
 import passport from 'passport';
-import { UsersManagerMongo } from '../daos/usersManagerMongo.js';
+import { UsersManagerMongo } from '../dao/MONGO/UsersMongo.js';
 import GithubStrategy from 'passport-github2';
 import jwt from 'passport-jwt';
-import { PRIVATE_KEY, generateToken } from '../utils/jsonwebtoken.js';
-import CartsMongoManager from '../daos/cartsManagerMongo.js';
+import { PRIVATE_KEY, generateToken } from '../util/jsonwebtoken.js';
+import CartsMongoManager from '../dao/MONGO/CartMongo.manager.js'
 import dotenv from 'dotenv';
 import { objectConfig } from './db.js';
 

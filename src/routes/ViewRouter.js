@@ -1,7 +1,11 @@
 import { Router } from "express";
 import { passportCall } from "../util/passportCall.js";
 import { authorizationJwt } from "../util/authorizationJwt.js";
-import { productService, cartService, userService, ticketService } from "../Service/service.js";
+import { productService, cartService, userService ,ticketService } from "../Service/service.js";
+import UserDto from "../dtos/usersDto.js";
+import UserSecureDto from "../dtos/userSecureDto.js";
+import generateProductsMock from "../util/generateProductsMock.js";
+
 
 const router = Router();
 
@@ -19,7 +23,7 @@ router.get('/register', (req, res) => {
 
 router.get('/users', passportCall('jwt'), authorizationJwt('admin', 'user'), async (req, res) => {
     const { numPage, limit } = req.query;
-    const { docs, page, hasPrevPage, hasNextPage, prevPage, nextPage } = await userService.getAll({ limit, numPage });
+    const { docs, page, hasPrevPage, hasNextPage, prevPage, nextPage } = await userService.getUsers({ limit, numPage });
 
     res.render('users.hbs', {
         users: docs,
@@ -31,7 +35,15 @@ router.get('/users', passportCall('jwt'), authorizationJwt('admin', 'user'), asy
     });
 });
 
-router.get('/products', passportCall('jwt'), authorizationJwt('admin', 'user'), async (req, res) => {
+router.get('/current', passportCall('jwt'), authorizationJwt('user'), async (req, res) => {
+    const {id} = req.user
+    const user = await userService.getUser({_id:id})
+    const secureUser = new UserSecureDto(user);
+
+    res.render('user.hbs', {user:secureUser});
+});
+
+router.get('/products', passportCall('jwt'), authorizationJwt('admin', 'user'),  async (req, res) => {
     const { limit = 10, pageNum = 1, category, status, product: title, sortByPrice } = req.query;
     const { docs, page, hasPrevPage, hasNextPage, prevPage, nextPage, totalPages } = await productService.getProducts({ limit, pageNum, category, status, title, sortByPrice });
     let prevLink = null;
@@ -74,28 +86,38 @@ router.get('/products', passportCall('jwt'), authorizationJwt('admin', 'user'), 
 
 router.get('/product/:pid', passportCall('jwt'), authorizationJwt('admin', 'user'), async (req, res) => {
     const { pid } = req.params;
-    const product = await productService.getProduct({ _id: pid });
+    const product = await productService.getProduct({_id: pid});
     res.render('./product.hbs', { product, cart: req.user.cart });
 });
 
 router.get('/cart/:cid', passportCall('jwt'), authorizationJwt('admin', 'user'), async (req, res) => {
     const { cid } = req.params;
-    const cart = await cartService.getCart({ _id: cid });
+    const cart = await cartService.getCart({_id: cid});
     res.render('./cart.hbs', { cart });
 });
 
-router.get('/ticket/:tid', passportCall('jwt'), authorizationJwt('admin', 'user'), async (req, res) => {
-    const { tid } = req.params;
-    const ticket = await ticketService.getBy({ _id: tid });
-    res.render('./ticket.hbs', { ticket });
+router.get('/tickets', passportCall('jwt'), async (req, res) => {
+    const { email } = req.user;
+    const ticket = await ticketService.getTickets({purchaser: email});
+    
+    res.render('./tickets.hbs', { ticket, email });
 });
 
-router.get('/realtimeproducts', async (req, res) => {
+router.get('/realtimeproducts', passportCall('jwt'), async (req, res) => {
     res.render('./realtimeproducts.hbs', {});
 });
 
 router.get('/chat', passportCall('jwt'), authorizationJwt('user'), async (req, res) => {
     res.render('./chat.hbs', {});
 });
+
+router.get('/mockingproducts', (req,res) => {
+    let products = []
+    for (let i = 0; i < 100; i++) {
+        products.push(generateProductsMock())
+        
+    }
+    res.send({status:'success', payload:products})
+})
 
 export default router;

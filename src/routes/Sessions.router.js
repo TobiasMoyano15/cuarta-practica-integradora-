@@ -1,12 +1,14 @@
 import { Router } from 'express';
-import { UsersManagerMongo } from '../dao/UsersMongo.js';
-import { createHash, isValidPassword } from '../util/bcrypt.js'; 
 import passport from 'passport';
-import { auth } from '../middlewares/auth.middleware.js';
-import { passportCall } from '../util/passportCall.js';
-import CartsMongoManager from '../dao/CartMongo.manager.js';
 import { authorizationJwt } from '../util/authorizationJwt.js';
+import { createHash, isValidPassword } from '../util/bcrypt.js';
+import { passportCall } from '../util/passportCall.js';
 import { authTokenMiddleware, generateToken } from '../util/jsonwebtoken.js';
+import { objectConfig } from '../Config/db.js';
+import UserDto from '../dtos/usersDto.js';
+import CartController from '../Controller/carts.controller.js';
+import { cartService, userService } from '../Service/service.js';
+import { logger } from '../util/logger.js';
 
 export const sessionsRouter = Router();
 
@@ -58,7 +60,7 @@ sessionsRouter.post('/register', async (req, res) => {
         }).send({ status: 'Success', message: 'Usuario registrado' });
 
     } catch (error) {
-        console.log('error:', error);
+        logger.error('error:', error);
         return res.status(500).send({ status: 'error', error: 'Ocurrió un error, por favor intentalo nuevamente' });
     }
 });
@@ -104,7 +106,7 @@ sessionsRouter.post('/logout', (req, res) => {
         res.clearCookie('token');
         return res.redirect('/login');
     } catch (error) {
-        console.log('error:', error);
+        logger.error('error:', error);
         return res.status(500).send({ status: 'error', error: 'Ocurrió un error, por favor intentalo nuevamente' });
     }
 });

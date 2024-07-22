@@ -1,9 +1,10 @@
 import fs from 'fs';
-import __dirname from '../util/filenameUtils.js';
+import { __dirname } from '../util/filenameUtils.js';
+import { logger } from '../util/logger.js';
 
 const path = `${__dirname}/Carts.json`;
 
-class CartManager {
+class CartsDaoFS {
     constructor(path) {
         this.path = path;
     }
@@ -13,20 +14,20 @@ class CartManager {
             const cartsJson = await fs.promises.readFile(this.path, 'utf-8');
             return JSON.parse(cartsJson);
         } catch (error) {
-            console.error('Error al leer el archivo:', error);
+            logger.error(error);
             return [];
         }
-    }
+    };
 
     writeCart = async (cartsData) => {
         try {
             await fs.promises.writeFile(this.path, JSON.stringify(cartsData, null, '\t'), 'utf-8');
         } catch (error) {
-            console.error('Error al escribir en el archivo:', error);
+            logger.error(error);
         }
-    }
+    };
 
-    addNewCart = async () => {
+    create = async () => {
         try {
             const cart = {
                 id: await this.getNextId(),
@@ -37,10 +38,10 @@ class CartManager {
             await this.writeCart(cartsData);
             return cart;
         } catch (error) {
-            console.error('Error al agregar nuevo carrito:', error);
+            logger.error('Error al crear nuevo carrito:', error);
             throw error;
         }
-    }
+    };
 
     addProductToCart = async (cartId, product, quantity) => {
         try {
@@ -64,24 +65,23 @@ class CartManager {
             return cart;
 
         } catch (error) {
-            console.error('Error al agregar producto al carrito:', error);
+            logger.error('Error al agregar producto al carrito:', error);
             throw error;
         }
-    }
+    };
 
-    getCartById = async (cartId) => {
+    getBy = async (filter) => {
         try {
             const cartsData = await this.readCartsJson();
-            const cart = cartsData.find(cart => cart.id === cartId);
+            const foundCart = cartsData.find(cart => cart.id === filter);
 
-            if (cart) return cart;
-            throw new Error(`No existe el carrito con el id ${cartId}`);
-
+            if (foundCart) return foundCart;
+            throw new Error(`No existe el carrito con el id ${filter}`);
         } catch (error) {
-            console.error('Error al obtener el carrito:', error);
+            logger.error('Error al obtener el carrito:', error);
             throw error;
         }
-    }
+    };
 
     getNextId = async () => {
         const cartsData = await this.readCartsJson();
@@ -89,7 +89,7 @@ class CartManager {
             return 1;
         }
         return cartsData[cartsData.length - 1].id + 1;
-    }
+    };
 }
 
-export default CartManager;
+export default CartFS;

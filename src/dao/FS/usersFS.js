@@ -1,10 +1,11 @@
 import fs from 'node:fs';
 import __dirname from '../util/filenameUtils.js';
+import { logger } from '../util/logger.js';
 
-const path = `${__dirname}/FS-Database/Users.json`;
+const path = `${__dirname}/files/Users.json`;
+
 class UsersDaoFS {
-
-    constructor(path) {
+    constructor() {
         this.path = path;
     }
 
@@ -13,12 +14,17 @@ class UsersDaoFS {
             const usersJson = await fs.promises.readFile(this.path, 'utf-8');
             return JSON.parse(usersJson);
         } catch (error) {
+            logger.error('Error al leer el archivo:', error);
             return [];
         }
     };
 
     writeUserJson = async (userData) => {
-        await fs.promises.writeFile(this.path, JSON.stringify(userData, null, '\t'), 'utf-8');
+        try {
+            await fs.promises.writeFile(this.path, JSON.stringify(userData, null, '\t'), 'utf-8');
+        } catch (error) {
+            logger.error('Error al escribir en el archivo:', error);
+        }
     };
 
     create = async (first_name, last_name, email, age, password, cart, role) => {
@@ -37,37 +43,36 @@ class UsersDaoFS {
             const usersData = await this.readUsersJson();
             const emailExistsCheck = usersData.find((usr) => usr.email === email);
             const mandatoryDataCheck = [];
+
             for (const prop in newUser) {
                 if (!newUser[prop]) {
                     mandatoryDataCheck.push(prop);
                 }
             }
-            
+
             if (!newUser.email || !newUser.password) {
-                if (mandatoryDataCheck.length > 1)
-                    throw new Error(`¡ERROR! debe llenar todods los campos\nFaltaron agregar ${mandatoryDataCheck.join(', ')}`);
-                throw new Error(`¡ERROR! debe llenar todods los campos\nFaltó agregar ${mandatoryDataCheck.join(', ')}`);
-            };
+                const errorMessage = `¡ERROR! debe llenar todos los campos\nFaltaron agregar ${mandatoryDataCheck.join(', ')}`;
+                throw new Error(mandatoryDataCheck.length > 1 ? errorMessage : errorMessage.replace('Faltaron agregar', 'Faltó agregar'));
+            }
 
             if (typeof email !== 'string' || typeof password !== 'string' || typeof first_name !== 'string' || typeof last_name !== 'string' || typeof role !== 'string' || typeof cart !== 'string') {
-                throw new Error("email, password, first_name, last_name y role deben ser string");
+                throw new Error("email, password, first_name, last_name, role y cart deben ser string");
             }
 
             if (typeof age !== 'number') {
                 throw new Error("Edad debe ser numérico");
             }
 
-
             if (emailExistsCheck) {
-                throw new Error(`¡ERROR! El mail ${newUser.title} ya está siendo utlizado, porfavor utiliza otro email, o inicia sesión`);
-            };
+                throw new Error(`¡ERROR! El email ${newUser.email} ya está siendo utilizado, por favor utiliza otro email o inicia sesión`);
+            }
 
             usersData.push(newUser);
-            this.writeUserJson(usersData);
+            await this.writeUserJson(usersData);
             return usersData;
-
         } catch (error) {
-            return error;
+            logger.error('Error al agregar usuario:', error);
+            throw error;
         }
     };
 
@@ -78,55 +83,63 @@ class UsersDaoFS {
     getBy = async (filter) => {
         try {
             const userData = await this.readUsersJson();
-            const foundUser = userData.find(prod => prod.filter === filter);
+            const foundUser = userData.find(user => user.filter === filter);
+            if (!foundUser) throw new Error(`No se encontró el usuario con el filtro: ${filter}`);
             return foundUser;
         } catch (error) {
-            return error;
+            logger.error('Error al obtener usuario por filtro:', error);
+            throw error;
         }
     };
 
     update = async (userId, updatedUser) => {
         try {
             const userData = await this.readUsersJson();
-            const userIndex = await userData.findIndex(usr => usr.id === userId);
+            const userIndex = userData.findIndex(usr => usr.id === userId);
 
-            if (await userIndex === -1) {
+            if (userIndex === -1) {
                 throw new Error(`El usuario con el id: ${userId} no existe`);
             }
 
-            const updatedUser = {
+            const newUpdatedUser = {
                 ...userData[userIndex],
                 ...updatedUser
             };
 
-            userData[userIndex] = updatedUser;
-            this.writeUserJson(userData);
+            userData[userIndex] = newUpdatedUser;
+            await this.writeUserJson(userData);
             return userData;
-
         } catch (error) {
-            throw new Error('Error', error);
+            logger.error('Error al actualizar usuario:', error);
+            throw error;
         }
     };
 
     remove = async (userId) => {
-        const userData = await this.readUsersJson();
-        const userToDeleteIndex = userData.findIndex(usr => usr.id === userId);
+        try {
+            const userData = await this.readUsersJson();
+            const userToDeleteIndex = userData.findIndex(usr => usr.id === userId);
 
-        if (userToDeleteIndex === -1) {
-            return `No existe el producto con id: ${userId}`;
+            if (userToDeleteIndex === -1) {
+                throw new Error(`No existe el usuario con id: ${userId}`);
+            }
+
+            logger.info(`El usuario ${userData[userToDeleteIndex].email} con el id ${userId} fue eliminado`);
+            userData.splice(userToDeleteIndex, 1);
+            await this.writeUserJson(userData);
+        } catch (error) {
+            logger.error('Error al eliminar usuario:', error);
+            throw error;
         }
-        console.log(`EL usuario ${userData[userToDeleteIndex].email} con el id ${userId} fue eliminado`);
-        userData.splice(userToDeleteIndex, 1);
-        this.writeUserJson(userData);
     };
 
     getNextId = async () => {
         const userData = await this.readUsersJson();
         if (userData.length === 0) {
             return 1;
-        };
+        }
         return userData[userData.length - 1].id + 1;
     };
-};
+}
 
 export default UsersDaoFS;

@@ -1,4 +1,8 @@
-import { chatService } from "../service/service";
+import { chatService } from "../Service/service.js";
+import { logger } from "./logger.js";
+
+
+// Chat socketIO
 export const chatSocketIO = (io) => {
 
     let messages = [];
@@ -8,7 +12,7 @@ export const chatSocketIO = (io) => {
         socket.emit('messageLog', messages);
         
         socket.on('message', async data => {
-            console.log('message data: ', data);
+            logger.info('message data: ', data);
             await chatService.createMessage(data.user, data.message);
             messages = await chatService.getMessages();
             io.emit('messageLog', messages);

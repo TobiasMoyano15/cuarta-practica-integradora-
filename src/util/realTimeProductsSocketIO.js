@@ -1,18 +1,19 @@
 import RealTimeProductController from "../Controllers/realTimeProductsController.js";
+import { logger } from "./logger.js";
 
+// falta implementar createRealTimeProduct
 
 const {
     getRealTimeProducts,
     createRealTimeProduct
 } = new RealTimeProductController();
 
-// socket.io config para el endpoint de realtimeproducts
 export const realTimeProducts = (io) => {
     io.on("connection", async (socket) => {
-        console.log('Cliente conectado');
+        logger.info('Cliente conectado');
         const products = await getRealTimeProducts();
 
-        socket.emit("getProducts", products.docs);
+        socket.emit("getProducts", products);
 
         socket.on("createProduct", async (newProductData) => {
             try {
@@ -29,7 +30,7 @@ export const realTimeProducts = (io) => {
                 io.emit("getProducts", await getRealTimeProducts());
                 return responseData;
             } catch (error) {
-                console.error("Error", error);
+                logger.error("Error", error);
             }
         });
 
@@ -40,7 +41,7 @@ export const realTimeProducts = (io) => {
                 io.emit("getProducts", await getRealTimeProducts());
 
             } catch (error) {
-                console.error("Error", error);
+                logger.error("Error", error);
             }
         });
 
@@ -50,11 +51,8 @@ export const realTimeProducts = (io) => {
                 io.emit("getProducts", await getRealTimeProducts());
 
             } catch (error) {
-                console.error("Error", error);
-
+                logger.error("Error", error);
             }
         });
-
     });
-
 };

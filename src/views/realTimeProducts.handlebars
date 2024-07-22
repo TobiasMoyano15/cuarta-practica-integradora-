@@ -1,42 +1,110 @@
 <main>
-    <h1>Nuestros cafés</h1>
-    <div class="contenedor">
-        <div class="box">
-            <form id="addProductForm">
-                <h4>Agregar Producto Nuevo:</h4>
-                <div>
-                    <label for="title">title<br><input type="text" name="title" id="title" placeholder="title" value="Producto Prueba 01"></label>
-                </div>
-                <div>
-                    <label for="description">description<br><input type="text" name="description" id="description" placeholder="description" value="Descripción Prueba 01"></label>
-                </div>
-                <div>
-                    <label for="code">code<br><input type="text" name="code" id="code" placeholder="code" value="Código Prueba 01"></label>
-                </div>
-                <div>
-                    <label for="price">price<br><input type="text" name="price" id="price" placeholder="price" value="999"></label>
-                </div>
-                <div>
-                    <label for="status">status<br><input type="checkbox" name="status" id="status" placeholder="status" checked></label>
-                </div>
-                <div>
-                    <label for="stock">stock<br><input type="text" name="stock" id="stock" placeholder="stock" value="999"></label>
-                </div>
-                <div>
-                    <label for="category">category<br><input type="text" name="category" id="category" placeholder="category" value="Categoría Prueba 01"></label>
-                </div>
-                <div>
-                    <label for="thumbnails">thumbnails<br><input type="text" name="thumbnails" id="thumbnails" placeholder="thumbnails" value="/rutade/thumbnails"></label>
-                </div>
-                <button type="submit">Agregar Producto</button>
-            </form>
+  <h1>Nuestras Prendas</h1>
+  <div class="contenedor">
+    <div class="box">
+      <form id="createProductForm">
+        <h4>Agregar Producto Nuevo:</h4>
+        <div>
+          <label for="title">title<br /><input
+              type="text"
+              name="title"
+              id="title"
+              placeholder="title"
+              value="Producto Prueba 01"
+            /></label>
         </div>
-        <div class="box">
-            <h2>Productos</h2>
-            <ul id="listProducts"></ul>
+        <div>
+          <label for="description">description<br /><input
+              type="text"
+              name="description"
+              id="description"
+              placeholder="description"
+              value="Descripción Prueba 01"
+            /></label>
         </div>
+        <div>
+          <label for="code">code<br /><input
+              type="text"
+              name="code"
+              id="code"
+              placeholder="code"
+              value="Código Prueba 01"
+            /></label>
+        </div>
+        <div>
+          <label for="price">price<br /><input
+              type="text"
+              name="price"
+              id="price"
+              placeholder="price"
+              value="999"
+            /></label>
+        </div>
+        <div>
+          <label for="status">status<br /><input
+              type="checkbox"
+              name="status"
+              id="status"
+              placeholder="status"
+              checked="checked"
+            /></label>
+        </div>
+        <div>
+          <label for="stock">stock<br /><input
+              type="text"
+              name="stock"
+              id="stock"
+              placeholder="stock"
+              value="999"
+            /></label>
+        </div>
+        <div>
+          <label for="category">category<br /><input
+              type="text"
+              name="category"
+              id="category"
+              placeholder="category"
+              value="Categoría Prueba 01"
+            /></label>
+        </div>
+        <div>
+          <label for="thumbnails">thumbnails<br /><input
+              type="text"
+              name="thumbnails"
+              id="thumbnails"
+              placeholder="thumbnails"
+              value="/rutade/thumbnails"
+            /></label>
+        </div>
+        <button type="submit">Agregar Producto</button>
+      </form>
     </div>
+    <div class="box">
+      <h2>Productos</h2>
+      <ul id="listProducts">
+      <div>
+        <div class="product-grid">
+          {{#each products}}
+            <div class="product-card">
+              <div class="product-image">
+                <img src="/images/IMG_placeholder.jpg" alt="Product" />
+              </div>
+              <div class="product-info">
+                <h2 class="product-title">{{this.title}}</h2>
+                <h3 class="product-price">${{this.price}}</h3>
+              </div>
+              <a href="/product/{{this._id}}"><button
+                  class="product-btn"
+                  data-product-id="{{this._id}}"
+                  data-cart-id="{{../cart}}"
+                >Ver más</button></a>
+            </div>
+          {{/each}}
+        </div>
+      </div>
+      </ul>
+    </div>
+  </div>
 </main>
-
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/realtimeproducts.js"></script>

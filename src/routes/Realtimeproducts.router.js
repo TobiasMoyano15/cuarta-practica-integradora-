@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { __dirname } from '../FileNameUtil.js'
-import ProductDao from '../dao/ProductsFS.manager.js';
+import ProductFSManager from '../dao/FS/ProductsFS.manager.js';
 import realTimeProductController from '../Controllers/realTimeProductsController.js';
 
 const router = Router();

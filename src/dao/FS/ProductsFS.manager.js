@@ -1,6 +1,6 @@
-// CRUD en Archivos (Files System)
 import fs from 'node:fs';
 import __dirname from '../util/filenameUtils.js';
+import { logger } from '../util/logger.js';
 
 const path = `${__dirname}/FS-Database/Products.json`;
 
@@ -14,7 +14,7 @@ class ProductFSManager {
             const productsJson = await fs.promises.readFile(this.path, 'utf-8');
             return JSON.parse(productsJson);
         } catch (error) {
-            console.error('Error al leer el archivo:', error);
+            logger.error('Error al leer el archivo:', error);
             return [];
         }
     }
@@ -23,15 +23,15 @@ class ProductFSManager {
         try {
             await fs.promises.writeFile(this.path, JSON.stringify(productsData, null, '\t'), 'utf-8');
         } catch (error) {
-            console.error('Error al escribir en el archivo:', error);
+            logger.error('Error al escribir en el archivo:', error);
         }
     }
 
-    getProducts = async () => {
+    getAll = async () => {
         return await this.readProductsJson();
     }
 
-    addProduct = async (title, description, code, price, status, stock, category, thumbnails = './images/IMG_placeholder.jpg') => {
+    create = async (title, description, code, price, status, stock, category, thumbnails = './images/IMG_placeholder.jpg') => {
         try {
             const product = {
                 id: await this.getNextId(),
@@ -83,23 +83,24 @@ class ProductFSManager {
             await this.writeProduct(productsData);
             return productsData;
         } catch (error) {
-            console.error('Error al agregar producto:', error);
+            logger.error('Error al agregar producto:', error);
             throw error;
         }
     }
 
-    getProductsById = async (productId) => {
+    getById = async (productId) => {
         try {
             const productsData = await this.readProductsJson();
-            const idCheck = productsData.find((prod) => prod.id === productId);
-            return idCheck;
+            const product = productsData.find((prod) => prod.id === productId);
+            if (product) return product;
+            throw new Error(`No existe el producto con id: ${productId}`);
         } catch (error) {
-            console.error('Error al obtener producto por ID:', error);
+            logger.error('Error al obtener producto por ID:', error);
             throw error;
         }
     }
 
-    updateProduct = async (productId, updatedProduct) => {
+    update = async (productId, updatedProduct) => {
         try {
             const productsData = await this.readProductsJson();
             const productIndex = productsData.findIndex(product => product.id === productId);
@@ -118,25 +119,25 @@ class ProductFSManager {
             await this.writeProduct(productsData);
             return productsData;
         } catch (error) {
-            console.error('Error al actualizar producto:', error);
+            logger.error('Error al actualizar producto:', error);
             throw error;
         }
     }
 
-    deleteProduct = async (productId) => {
+    remove = async (productId) => {
         try {
             const productsData = await this.readProductsJson();
             const productToDeleteIndex = productsData.findIndex(product => product.id === productId);
             
             if (productToDeleteIndex === -1) {
-                return `No existe el producto con id: ${productId}`;
+                throw new Error(`No existe el producto con id: ${productId}`);
             }
 
-            console.log(`El producto ${productsData[productToDeleteIndex].title} con el id ${productId} fue eliminado`);
+            logger.info(`El producto ${productsData[productToDeleteIndex].title} con el id ${productId} fue eliminado`);
             productsData.splice(productToDeleteIndex, 1);
             await this.writeProduct(productsData);
         } catch (error) {
-            console.error('Error al eliminar producto:', error);
+            logger.error('Error al eliminar producto:', error);
             throw error;
         }
     }
