@@ -1,7 +1,7 @@
 import { logger } from "../util/logger.js";
 import ticketModel from "./models/ticket.model.js";
 
-class TicketsDaoMongo {
+class TicketsMongo {
   constructor() {
     this.ticketModel = ticketModel;
   }
@@ -47,4 +47,4 @@ class TicketsDaoMongo {
   };
 }
 
-export default TicketsDaoMongo;
+export default TicketsMongo;

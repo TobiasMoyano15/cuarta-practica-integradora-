@@ -5,8 +5,11 @@ import { productService, cartService, userService ,ticketService } from "../Serv
 import UserDto from "../dtos/usersDto.js";
 import UserSecureDto from "../dtos/userSecureDto.js";
 import generateProductsMock from "../util/generateProductsMock.js";
+import { logger } from "../util/logger.js";
+import jwt from 'jsonwebtoken';
+import { objectConfig } from "../Config/db.js";
 
-
+const {jwt_private_key} = objectConfig
 const router = Router();
 
 router.get('/', async (req, res) => {
@@ -20,8 +23,28 @@ router.get('/login', (req, res) => {
 router.get('/register', (req, res) => {
     res.render('register.hbs');
 });
+router.get('/password-recovery', async (req, res) => {
+    res.render('password-recovery.hbs');
+});
+router.get('/reset-password',async (req, res) => {
+    const token = req.query.token
+    
+    if (!token) {
+        return res.render('password-recovery.hbs');
+    }
 
-router.get('/users', passportCall('jwt'), authorizationJwt('admin', 'user'), async (req, res) => {
+    try {
+        const tokenCheck = jwt.verify(token, jwt_private_key);
+        logger.info('Token: ', tokenCheck);
+        res.render('reset-password.hbs', { token });
+    } catch (error) {
+        logger.error('Token Invalido o expirado:', error);
+        res.render('password-recovery.hbs');
+    }
+});
+
+
+router.get('/users', passportCall('jwt'), authorizationJwt('admin', 'premium', 'user'), async (req, res) => {
     const { numPage, limit } = req.query;
     const { docs, page, hasPrevPage, hasNextPage, prevPage, nextPage } = await userService.getUsers({ limit, numPage });
 
@@ -43,7 +66,7 @@ router.get('/current', passportCall('jwt'), authorizationJwt('user'), async (req
     res.render('user.hbs', {user:secureUser});
 });
 
-router.get('/products', passportCall('jwt'), authorizationJwt('admin', 'user'),  async (req, res) => {
+router.get('/products', passportCall('jwt'), authorizationJwt('admin', 'premium', 'user'),  async (req, res) => {
     const { limit = 10, pageNum = 1, category, status, product: title, sortByPrice } = req.query;
     const { docs, page, hasPrevPage, hasNextPage, prevPage, nextPage, totalPages } = await productService.getProducts({ limit, pageNum, category, status, title, sortByPrice });
     let prevLink = null;
@@ -84,13 +107,18 @@ router.get('/products', passportCall('jwt'), authorizationJwt('admin', 'user'), 
     });
 });
 
-router.get('/product/:pid', passportCall('jwt'), authorizationJwt('admin', 'user'), async (req, res) => {
+router.get('/product/:pid', passportCall('jwt'), authorizationJwt('admin', 'premium', 'user'), async (req, res) => {
     const { pid } = req.params;
-    const product = await productService.getProduct({_id: pid});
-    res.render('./product.hbs', { product, cart: req.user.cart });
+    try {
+        const product = await productService.getProduct({_id: pid});
+        res.render('./product.hbs', { product, cart: req.user.cart });
+        
+    } catch (error) {
+        res.send({status:"error", error: error.message } )
+    }
 });
 
-router.get('/cart/:cid', passportCall('jwt'), authorizationJwt('admin', 'user'), async (req, res) => {
+router.get('/cart/:cid', passportCall('jwt'), authorizationJwt('admin', 'premium', 'user'), async (req, res) => {
     const { cid } = req.params;
     const cart = await cartService.getCart({_id: cid});
     res.render('./cart.hbs', { cart });
@@ -102,6 +130,10 @@ router.get('/tickets', passportCall('jwt'), async (req, res) => {
     
     res.render('./tickets.hbs', { ticket, email });
 });
+
+router.get('/create-products', passportCall('jwt'), authorizationJwt('premium', 'admin'), async (req, res) =>{
+    res.render('./createproducts.hbs')
+})
 
 router.get('/realtimeproducts', passportCall('jwt'), async (req, res) => {
     res.render('./realtimeproducts.hbs', {});

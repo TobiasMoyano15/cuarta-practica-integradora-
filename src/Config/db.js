@@ -2,15 +2,11 @@ import dotenv from 'dotenv';
 import { connect } from 'mongoose';
 import { program } from '../util/commander.js';
 
-// Obtenemos el modo (production o development) desde los parámetros de la línea de comandos
 const { mode } = program.opts();
-
-// Configuración de dotenv
 dotenv.config({
   path: mode === 'production' ? './.env.production' : './.env.development'
 });
 
-// Definición de las configuraciones en un objeto
 export const objectConfig = {
   port: process.env.PORT || 8080,
   jwt_private_key: process.env.JWT_PRIVATE_KEY,
@@ -22,16 +18,14 @@ export const objectConfig = {
   admin_email: process.env.ADMIN_EMAIL,
   admin_password: process.env.ADMIN_PASS,
   admin_cart: process.env.ADMIN_CART,
+  gmail_user: process.env.GMAIL_USER,
+  gmail_pass: process.env.GMAIL_PASS,
   persistence: process.env.PERSISTENCE,
   environment: process.env.ENVIRONMENT
 };
 
-// Función para conectar a MongoDB
+
 export const connectMongoDb = async () => {
-  try {
-    await connect(process.env.MONGO_URL);
-    console.log('Base de datos conectada');
-  } catch (error) {
-    console.error('Error al conectar a la base de datos', error);
-  }
+  console.log('Base de datos conectada');
+  connect(process.env.MONGO_URL);
 };

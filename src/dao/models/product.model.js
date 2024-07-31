@@ -14,12 +14,16 @@ const productsSchema = new Schema({
     stock: Number,
     category: {
         type: String,
-        enum: ["cafe", "te", "comestibles", "jugos"] // Corregido "emum" a "enum"
+        emum: ["cafe", "te", "comestibles", "jugos"]
     },
-    thumbnails: String
+    thumbnails: String,
+    owner: {
+        type: String,
+        default: "admin"
+    }
 });
 
-productsSchema.plugin(mongoosePaginate);
+productsSchema.plugin(mongoosePaginate).index({ title: 'text' });
 
-const productsModel = model('products', productsSchema);
-export default productsModel;
+const ProductsModel = model('products', productsSchema);
+export default ProductsModel;

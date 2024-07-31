@@ -1,44 +1,30 @@
-<main class="container">
-    <h1>Login</h1>
-    {{#if error}}
-    <div class="alert alert-danger" role="alert">
-        {{error}}
+<main class="container text-center w-50">
+
+  <h1>Inicia sesión con tu cuenta</h1>
+  {{#if error}}
+  <div class="alert alert-danger" role="alert">
+    {{error}}
+  </div>
+  {{/if}}
+  <form id="loginForm" class="form-group w-100">
+    <div class="container">
+      <label>Email</label>
+      <input type="email" name="email" placeholder="Ingresa tu mail ejemplo@mail.com" class="form-control" />
+      <label>password</label>
+      <input type="text" name="password" placeholder="Ingresa tu contraseña" class="form-control" />
+      <button type="submit" id="logInBtn" class="btn btn-outline-dark w-100 mt-3">Login</button>
+      <a id="forgotPasswordBtn" class="forgot-password-link" href="#">¿olvidaste tu contraseña?</a>
     </div>
-    {{/if}}
-    <form id="loginForm" action="/api/sessions/login" method="POST" class="form-group w-50">
-        <div class="container">
-            <label>Email</label>
-            <input
-                type="email"
-                name="email"
-                placeholder="Ingresa tu mail ejemplo@mail.com"
-                class="form-control"
-            />
-            <label>Password</label>
-            <input
-                type="password"
-                name="password"
-                placeholder="Ingresa tu contraseña"
-                class="form-control"
-            />
-            <button
-                type="submit"
-                id="logInBtn"
-                class="btn btn-outline-dark w-100 mt-3"
-            >Login</button>
-        </div>
-        <div class="container mt-3">
-            <label>¿No tienes usuario?</label>
-            <button
-                type="button"
-                id="registerBtn"
-                class="btn btn-outline-dark w-100 mt-3"
-            >Registrate</button>
-        </div>
-    </form>
-    <div>
-        <a class="btn btn-dark w-50 mt-3" href="/api/sessions/github">Inicia sesión con Github</a>
+    <div class="altLogin">
+      <h2>- o inicia sesión con -</h2>
+      <div class="container mt-3">
+        <button class="btn btn-dark w-100" href="/api/sessions/github">Github</button>
+      </div>
     </div>
+    <div class="altLogin">
+      <label>¿No tienes usuario?</label>
+      <button type="button" id="registerBtn" class="btn btn-outline-dark w-100 mt-3">Registrate</button>
+    </div>
+  </form>
+
 </main>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.all.min.js"></script>
-<script async src="/js/login.js"></script>

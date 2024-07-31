@@ -7,7 +7,7 @@ import cartsRouter from "./CartRouter.js";
 import usersRouter from "./Users.router.js";
 import chatRouter from "./ChatRouter.js";
 import { sessionsRouter } from "./Sessions.router.js";
-
+import notFoundRouter from "./notFound.router.js";
 
 const router = Router()
 
@@ -19,5 +19,6 @@ router.use("/Carts", cartsRouter);
 router.use("/Realtimeproducts", realtimeproductsRouter);
 router.use("/Chat", chatRouter);
 router.use("/Pruebas", pruebasRouter);
+router.use("*", notFoundRouter)
 
 export default router

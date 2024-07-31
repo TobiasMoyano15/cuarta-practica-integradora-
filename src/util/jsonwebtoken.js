@@ -4,7 +4,7 @@ const { jwt_private_key } = objectConfig;
 
 export const PRIVATE_KEY = jwt_private_key;
 
-export const generateToken = (user) => jwt.sign(user, PRIVATE_KEY, { expiresIn: '24h' });
+export const generateToken = (user, expiresIn = '24h') => jwt.sign(user, PRIVATE_KEY, { expiresIn });
 
 export const authTokenMiddleware = (req, res, next) => {
     const authHeader = req.headers.authorization;

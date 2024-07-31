@@ -1,14 +1,14 @@
 const registerBtn = document.querySelector('#registerBtn');
-const loginForm = document.querySelector('#loginForm');
+const forgotPasswordBtn = document.querySelector('#forgotPasswordBtn')
 
 registerBtn.addEventListener('click', (evt) => {
     evt.preventDefault();
     window.location.href = '/register';
 });
 
-loginForm.addEventListener('submit', handleLogin);
+const loginForm = document.querySelector('#loginForm');
 
-async function handleLogin(evt) {
+loginForm.addEventListener('submit', async (evt) => {
     evt.preventDefault();
 
     const formData = new FormData(loginForm);
@@ -20,26 +20,33 @@ async function handleLogin(evt) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(data)
         });
-
         if (response.ok) {
             window.location.href = '/products';
+
         } else {
             const errorText = await response.json();
-            showErrorModal(errorText.error);
+            Swal.fire({
+                title: 'Error!',
+                text: errorText.error,
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
         }
     } catch (error) {
+        
         console.error('Error:', error);
-        showErrorModal('Ocurrió un error, por favor inténtalo nuevamente.');
+        Swal.fire({
+            title: 'Error!',
+            text: 'Ocurrió un error, porfavor intentalo nuevamente.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
     }
-}
+});
 
-function showErrorModal(message) {
-    Swal.fire({
-        title: 'Error!',
-        text: message,
-        icon: 'error',
-        confirmButtonText: 'OK'
-    });
-}
+forgotPasswordBtn.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    window.location.href = '/password-recovery';
+});
