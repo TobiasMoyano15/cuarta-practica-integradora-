@@ -3,18 +3,19 @@ import productsRouter from './routes/ProductRouter.js';
 import cartRouter from './routes/CartRouter.js';
 import viewsRouter from './routes/ViewRouter.js';
 import path from 'path';
-import multer from 'multer'; // Importa multer
+import multer from 'multer'; 
 import handlebars from 'express-handlebars';
-import { createServer } from 'http'; // Utiliza createServer de http
+import { createServer } from 'http'; 
 import { Server } from 'socket.io';
+import { swaggerUi, swaggerDocs } from '../src/swagger.js'; 
 
 const app = express();
 
-const httpServer = createServer(app); // Crea el servidor HTTP con express
+const httpServer = createServer(app); 
 
-const io = new Server(httpServer); // Crea una instancia de Socket.IO pasando el servidor HTTP
+const io = new Server(httpServer); 
 
-const __dirname = path.resolve(); // Obtén el directorio actual
+const __dirname = path.resolve();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -49,6 +50,9 @@ app.use('/', viewsRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/cart', cartRouter);
 
+// Documentación de Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
 let messages = [];
 io.on('connection', socket => {
     console.log('Cliente conectado');
@@ -62,4 +66,7 @@ io.on('connection', socket => {
 const PORT = 8080;
 httpServer.listen(PORT, () => {
     console.log(`Server escuchando en puerto ${PORT}`);
+    console.log('API Docs available at http://localhost:8080/api-docs');
 });
+
+export default app;
