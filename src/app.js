@@ -4,10 +4,10 @@ import cartRouter from './routes/CartRouter.js';
 import viewsRouter from './routes/ViewRouter.js';
 import path from 'path';
 import multer from 'multer'; 
-import handlebars from 'express-handlebars';
+import { engine } from 'express-handlebars'; // Corrección de la importación
 import { createServer } from 'http'; 
 import { Server } from 'socket.io';
-import { swaggerUi, swaggerDocs } from '../src/swagger.js'; 
+import { swaggerUi, swaggerDocs } from './swagger.js'; // Corrección de la ruta
 
 const app = express();
 
@@ -19,18 +19,20 @@ const __dirname = path.resolve();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public'))); // Corrige el path de la carpeta public
+app.use(express.static(path.join(__dirname, 'public'))); // Ruta correcta para los archivos estáticos
 
-app.engine('hbs', handlebars({
-    extname: '.hbs'
+app.engine('hbs', engine({ // Usa `engine` de `express-handlebars`
+    extname: '.hbs',
+    defaultLayout: 'main', // Puedes agregar un layout predeterminado si tienes uno
+    layoutsDir: path.join(__dirname, 'views/layouts') // Directorio para layouts
 }));
 
-app.set('views', path.join(__dirname, 'views')); // Corrige el path de la carpeta views
+app.set('views', path.join(__dirname, 'views')); // Ruta correcta para las vistas
 app.set('view engine', 'hbs');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, 'uploads')); // Corrige el path de la carpeta uploads
+        cb(null, path.join(__dirname, 'uploads')); // Ruta correcta para los archivos subidos
     },
     filename: function (req, file, cb) {
         cb(null, file.originalname);

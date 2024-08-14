@@ -1,6 +1,6 @@
 import fs from 'node:fs';
-import __dirname from '../util/filenameUtils.js';
-import { logger } from '../util/logger.js';
+import __dirname from '../../util/filenameUtils.js';
+import { logger } from '../../util/logger.js';
 
 const path = `${__dirname}/FS-Database/Products.json`;
 

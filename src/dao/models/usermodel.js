@@ -33,4 +33,5 @@ const userSchema = new Schema({
 
 userSchema.plugin(mongoosePaginate);
 
-export const userModel = model(userCollection, userSchema);
+const UserModel = { userCollection,userSchema };
+export default UserModel;

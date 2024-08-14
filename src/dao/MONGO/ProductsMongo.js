@@ -1,8 +1,8 @@
-import ProductsModel from './models/product.model.js';
+import ProductsModel from '../models/product.model.js';
 
 class ProductsMongo {
     constructor() {
-        this.productsModel = productsModel;
+        this.ProductsModel = ProductsModel;
     }
 
     create = async (title, description, code, price, status, stock, category, thumbnails = './images/IMG_placeholder.jpg', owner = 'admin') => {

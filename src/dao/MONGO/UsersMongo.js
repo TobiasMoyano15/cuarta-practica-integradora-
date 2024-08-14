@@ -1,8 +1,8 @@
-import UserModel from './models/usermodel.js';
+import UserModel from '../models/usermodel.js';
 
 class UsersMongo {
   constructor() {
-    this.userModel = userModel;
+    this.UserModel = UserModel;
   }
   create = async (newUser) => await userModel.create(newUser);
   getAll = async ({ limit = 10, numPage = 1 } = {}) => await this.userModel.paginate({}, { limit, page: numPage, sort: { price: -1 }, lean: true });

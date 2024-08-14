@@ -4,7 +4,7 @@ import CartsRepository from "../repositories/cartsRepository.js";
 import TicketsRepository from "../repositories/ticketsRepository.js";
 import ChatsRepository from "../repositories/chatsRepository.js";
 import RealTimeProductsRepository from "../repositories/realTimeProductsRepository.js";
-import { CartsDao, ChatsDao, ProductsDao, RealtimeProductsDao, TicketsDao, UsersDao } from "../daos/factory.js";
+import { CartsDao, ChatsDao, ProductsDao, RealtimeProductsDao, TicketsDao, UsersDao } from "../dao/factory.js";
 
 export const userService = new UsersRepository(new UsersDao());
 export const productService = new ProductsRepository(new ProductsDao());

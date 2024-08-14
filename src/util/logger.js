@@ -1,5 +1,5 @@
 import winston from 'winston'
-import { objectConfig } from '../Config/db'
+import { objectConfig } from '../Config/db.js'
 
 const customLevelsOptions = {
     levels: {

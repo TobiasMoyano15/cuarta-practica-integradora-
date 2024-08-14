@@ -8,4 +8,5 @@ const chatsSchema = new Schema ({
     message:String
 })
 
-export const chatsModel = model('messages', chatsSchema)
+const chatsModel = {chatsSchema}
+export default chatsModel

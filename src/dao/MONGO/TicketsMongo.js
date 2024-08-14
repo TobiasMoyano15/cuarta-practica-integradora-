@@ -1,5 +1,5 @@
-import { logger } from "../util/logger.js";
-import ticketModel from "./models/ticket.model.js";
+import { logger } from "../../util/logger.js";
+import ticketModel from "../models/ticket.model.js";
 
 class TicketsMongo {
   constructor() {
