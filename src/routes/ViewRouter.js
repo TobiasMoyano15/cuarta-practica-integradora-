@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { passportCall } from "../util/passportCall.js";
 import { authorizationJwt } from "../util/authorizationJwt.js";
-import { productService, cartService, userService ,ticketService } from "../Service/service.js";
+import { productService, cartService, userService, ticketService } from "../Service/service.js";
 import UserDto from "../dtos/usersDto.js";
 import UserSecureDto from "../dtos/userSecureDto.js";
 import generateProductsMock from "../util/generateProductsMock.js";
@@ -9,7 +9,7 @@ import { logger } from "../util/logger.js";
 import jwt from 'jsonwebtoken';
 import { objectConfig } from "../Config/db.js";
 
-const {jwt_private_key} = objectConfig
+const { jwt_private_key } = objectConfig;
 const router = Router();
 
 router.get('/', async (req, res) => {
@@ -23,11 +23,13 @@ router.get('/login', (req, res) => {
 router.get('/register', (req, res) => {
     res.render('register.hbs');
 });
+
 router.get('/password-recovery', async (req, res) => {
     res.render('password-recovery.hbs');
 });
-router.get('/reset-password',async (req, res) => {
-    const token = req.query.token
+
+router.get('/reset-password', async (req, res) => {
+    const token = req.query.token;
     
     if (!token) {
         return res.render('password-recovery.hbs');
@@ -38,11 +40,10 @@ router.get('/reset-password',async (req, res) => {
         logger.info('Token: ', tokenCheck);
         res.render('reset-password.hbs', { token });
     } catch (error) {
-        logger.error('Token Invalido o expirado:', error);
+        logger.error('Token Inválido o expirado:', error);
         res.render('password-recovery.hbs');
     }
 });
-
 
 router.get('/users', passportCall('jwt'), authorizationJwt('admin', 'premium', 'user'), async (req, res) => {
     const { numPage, limit } = req.query;
@@ -59,18 +60,19 @@ router.get('/users', passportCall('jwt'), authorizationJwt('admin', 'premium', '
 });
 
 router.get('/current', passportCall('jwt'), authorizationJwt('user'), async (req, res) => {
-    const {id} = req.user
-    const user = await userService.getUser({_id:id})
+    const { id } = req.user;
+    const user = await userService.getUser({ _id: id });
     const secureUser = new UserSecureDto(user);
 
-    res.render('user.hbs', {user:secureUser});
+    res.render('user.hbs', { user: secureUser });
 });
 
-router.get('/products', passportCall('jwt'), authorizationJwt('admin', 'premium', 'user'),  async (req, res) => {
+router.get('/products', passportCall('jwt'), authorizationJwt('admin', 'premium', 'user'), async (req, res) => {
     const { limit = 10, pageNum = 1, category, status, product: title, sortByPrice } = req.query;
     const { docs, page, hasPrevPage, hasNextPage, prevPage, nextPage, totalPages } = await productService.getProducts({ limit, pageNum, category, status, title, sortByPrice });
     let prevLink = null;
     let nextLink = null;
+
     if (hasPrevPage) {
         prevLink = `/products?pageNum=${prevPage}`;
         if (limit) prevLink += `&limit=${limit}`;
@@ -88,6 +90,7 @@ router.get('/products', passportCall('jwt'), authorizationJwt('admin', 'premium'
         if (status) nextLink += `&status=${status}`;
         if (sortByPrice) nextLink += `&sortByPrice=${sortByPrice}`;
     }
+
     return res.render('./index.hbs', {
         products: docs,
         totalPages,
@@ -110,30 +113,28 @@ router.get('/products', passportCall('jwt'), authorizationJwt('admin', 'premium'
 router.get('/product/:pid', passportCall('jwt'), authorizationJwt('admin', 'premium', 'user'), async (req, res) => {
     const { pid } = req.params;
     try {
-        const product = await productService.getProduct({_id: pid});
+        const product = await productService.getProduct({ _id: pid });
         res.render('./product.hbs', { product, cart: req.user.cart });
-        
     } catch (error) {
-        res.send({status:"error", error: error.message } )
+        res.send({ status: "error", error: error.message });
     }
 });
 
 router.get('/cart/:cid', passportCall('jwt'), authorizationJwt('admin', 'premium', 'user'), async (req, res) => {
     const { cid } = req.params;
-    const cart = await cartService.getCart({_id: cid});
+    const cart = await cartService.getCart({ _id: cid });
     res.render('./cart.hbs', { cart });
 });
 
 router.get('/tickets', passportCall('jwt'), async (req, res) => {
     const { email } = req.user;
-    const ticket = await ticketService.getTickets({purchaser: email});
-    
+    const ticket = await ticketService.getTickets({ purchaser: email });
     res.render('./tickets.hbs', { ticket, email });
 });
 
-router.get('/create-products', passportCall('jwt'), authorizationJwt('premium', 'admin'), async (req, res) =>{
-    res.render('./createproducts.hbs')
-})
+router.get('/create-products', passportCall('jwt'), authorizationJwt('premium', 'admin'), async (req, res) => {
+    res.render('./createproducts.hbs');
+});
 
 router.get('/realtimeproducts', passportCall('jwt'), async (req, res) => {
     res.render('./realtimeproducts.hbs', {});
@@ -143,13 +144,12 @@ router.get('/chat', passportCall('jwt'), authorizationJwt('user'), async (req, r
     res.render('./chat.hbs', {});
 });
 
-router.get('/mockingproducts', (req,res) => {
-    let products = []
+router.get('/mockingproducts', (req, res) => {
+    let products = [];
     for (let i = 0; i < 100; i++) {
-        products.push(generateProductsMock())
-        
+        products.push(generateProductsMock());
     }
-    res.send({status:'success', payload:products})
-})
+    res.send({ status: 'success', payload: products });
+});
 
 export default router;

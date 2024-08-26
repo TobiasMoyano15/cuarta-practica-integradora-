@@ -21,18 +21,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public'))); // Ruta correcta para los archivos estáticos
 
-app.engine('hbs', engine({ // Usa `engine` de `express-handlebars`
+// Configuración del motor de plantillas
+app.engine('hbs', engine({ 
     extname: '.hbs',
-    defaultLayout: 'main', // Puedes agregar un layout predeterminado si tienes uno
+    defaultLayout: 'main', // Nombre del layout predeterminado
     layoutsDir: path.join(__dirname, 'views/layouts') // Directorio para layouts
 }));
 
-app.set('views', path.join(__dirname, 'views')); // Ruta correcta para las vistas
+app.set('views', path.join(__dirname, 'views')); // Ruta para las vistas
 app.set('view engine', 'hbs');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, 'uploads')); // Ruta correcta para los archivos subidos
+        cb(null, path.join(__dirname, 'uploads')); // Ruta para los archivos subidos
     },
     filename: function (req, file, cb) {
         cb(null, file.originalname);
@@ -48,7 +49,7 @@ app.use('/upload-file', uploader.single('myFile'), (req, res) => {
     res.status(200).send('Archivo subido con éxito');
 });
 
-app.use('/', viewsRouter);
+app.use('/', viewsRouter); // Asegúrate de que las rutas en `ViewRouter` sean correctas
 app.use('/api/products', productsRouter);
 app.use('/api/cart', cartRouter);
 

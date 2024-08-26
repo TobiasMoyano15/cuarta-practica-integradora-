@@ -7,7 +7,8 @@ const {
     removeTicket
 } = new TicketController();
 
-router.get('/:tid', getTicket);
-router.delete('/:cid', removeTicket);
+// Asumiendo que la autenticación es requerida para ambos endpoints
+router.get('/:tid', passportCall('jwt'), getTicket);
+router.delete('/:tid', passportCall('jwt'), removeTicket);
 
 export default router;
